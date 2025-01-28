@@ -1,12 +1,12 @@
 package ca.vanier.budgetmanagement.config;
 
-import ca.vanier.budgetmanagement.entities.Category;
+import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.entities.User;
-import ca.vanier.budgetmanagement.services.CategoryService;
+import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.core.annotation.Order;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
@@ -15,40 +15,55 @@ import java.util.List;
 public class DataInitializer {
 
     UserService userService;
-    CategoryService categoryService;
+    ExpenseCategoryService expenseCategoryService;
 
-    public DataInitializer(UserService userService, CategoryService categoryService) {
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService) {
         this.userService = userService;
-        this.categoryService = categoryService;
+        this.expenseCategoryService = expenseCategoryService;
     }
 
     @Bean
     CommandLineRunner InitUsers(UserService userService) {
         return args -> {
-            User user1 = CreateUser("admin", "admin", "ADMIN", "admin", "admin", "admin@budgetmanagement.vanier.ca", "999-999-99999");
-            User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com", "123-456-7891");
-            User user3 = CreateUser("Jacques", "1234567489", "ADMIN", "Jacques", "Brown", "jacques.brown@example.com", "123-456-7892");
-            User user4 = CreateUser("Marie", "1234567489", "USER", "Marie", "Johnson", "marie.johnson@example.com", "123-456-7893");
-            User user5 = CreateUser("Sophie", "1234567489", "USER", "Sophie", "Williams", "sophie.williams@example.com", "123-456-7894");
-            User user6 = CreateUser("Louise", "1234567489", "USER", "Louise", "Jones", "louise.jones@example.com", "123-456-7895");
-            User user7 = CreateUser("Pierre", "1234567489", "ADMIN", "Pierre", "Garcia", "pierre.garcia@example.com", "123-456-7896");
-            User user8 = CreateUser("Luc", "1234567489", "USER", "Luc", "Martinez", "luc.martinez@example.com", "123-456-7897");
-            User user9 = CreateUser("François", "1234567489", "USER", "François", "Rodriguez", "francois.rodriguez@example.com", "123-456-7898");
-            User user0 = CreateUser("Michel", "1234567489", "USER", "Michel", "Hernandez", "michel.hernandez@example.com", "123-456-7899");
-          
+            User user1 = CreateUser("admin", "admin", "ADMIN", "admin", "admin", "admin@budgetmanagement.vanier.ca",
+                    "999-999-99999");
+            User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com",
+                    "123-456-7891");
+            User user3 = CreateUser("Jacques", "1234567489", "ADMIN", "Jacques", "Brown", "jacques.brown@example.com",
+                    "123-456-7892");
+            User user4 = CreateUser("Marie", "1234567489", "USER", "Marie", "Johnson", "marie.johnson@example.com",
+                    "123-456-7893");
+            User user5 = CreateUser("Sophie", "1234567489", "USER", "Sophie", "Williams", "sophie.williams@example.com",
+                    "123-456-7894");
+            User user6 = CreateUser("Louise", "1234567489", "USER", "Louise", "Jones", "louise.jones@example.com",
+                    "123-456-7895");
+            User user7 = CreateUser("Pierre", "1234567489", "ADMIN", "Pierre", "Garcia", "pierre.garcia@example.com",
+                    "123-456-7896");
+            User user8 = CreateUser("Luc", "1234567489", "USER", "Luc", "Martinez", "luc.martinez@example.com",
+                    "123-456-7897");
+            User user9 = CreateUser("François", "1234567489", "USER", "François", "Rodriguez",
+                    "francois.rodriguez@example.com", "123-456-7898");
+            User user0 = CreateUser("Michel", "1234567489", "USER", "Michel", "Hernandez",
+                    "michel.hernandez@example.com", "123-456-7899");
+
             userService.saveAll(List.of(user1, user2, user3, user4, user5, user6, user7, user8, user9, user0));
         };
 
     }
 
     @Bean
-    CommandLineRunner InitCategories(CategoryService categoryService) {
-        return args -> {
-            Category category1 = CreateCategory("Rent");
-            Category category2 = CreateCategory("Food");
-            Category category3 = CreateCategory("Entertainment");
+    CommandLineRunner InitExpenseCategories(ExpenseCategoryService categoryService) {
 
-            categoryService.saveAll(List.of(category1, category2, category3));
+        return args -> {
+            ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
+            ExpenseCategory category2 = CreateExpenseCategory("Food",
+                    (long) 2);
+            ExpenseCategory category3 = CreateExpenseCategory("Entertainment",
+                    (long) 3);
+
+            List<ExpenseCategory> expenseCategories = List.of(category1, category2,
+                    category3);
+            expenseCategories.forEach(expenseCategory -> expenseCategoryService.save(expenseCategory));
         };
 
     }
@@ -58,7 +73,7 @@ public class DataInitializer {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
-    private Category CreateCategory(String name) {
-        return new Category(name);
+    private ExpenseCategory CreateExpenseCategory(String name, Long userId) {
+        return new ExpenseCategory(name, userId);
     }
 }
