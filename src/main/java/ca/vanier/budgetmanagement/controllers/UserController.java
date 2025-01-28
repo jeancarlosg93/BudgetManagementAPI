@@ -19,7 +19,7 @@ public class UserController {
     public ResponseEntity<?> findAll() {
 
         try {
-            return ResponseEntity.ok(userService.findAll());
+            return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("No users found", HttpStatus.NOT_FOUND);
         }
@@ -28,7 +28,7 @@ public class UserController {
     @PutMapping("update/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         try {
-            return ResponseEntity.ok(userService.updateExistingUser(id, userDetails));
+            return new ResponseEntity<>(userService.updateExistingUser(id, userDetails), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping("/find/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(userService.findById(id));
+            return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("User with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
