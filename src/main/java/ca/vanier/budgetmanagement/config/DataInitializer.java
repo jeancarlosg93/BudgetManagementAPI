@@ -1,6 +1,8 @@
 package ca.vanier.budgetmanagement.config;
 
+import ca.vanier.budgetmanagement.entities.Category;
 import ca.vanier.budgetmanagement.entities.User;
+import ca.vanier.budgetmanagement.services.CategoryService;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +15,15 @@ import java.util.List;
 public class DataInitializer {
 
     UserService userService;
+    CategoryService categoryService;
 
-    public DataInitializer(UserService userService) {
+    public DataInitializer(UserService userService, CategoryService categoryService) {
         this.userService = userService;
+        this.categoryService = categoryService;
     }
 
     @Bean
-    CommandLineRunner Init(UserService userService) {
+    CommandLineRunner InitUsers(UserService userService) {
         return args -> {
             User user1 = CreateUser("admin", "admin", "ADMIN", "admin", "admin", "admin@budgetmanagement.vanier.ca", "999-999-99999");
             User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com", "123-456-7891");
@@ -31,13 +35,30 @@ public class DataInitializer {
             User user8 = CreateUser("Luc", "1234567489", "USER", "Luc", "Martinez", "luc.martinez@example.com", "123-456-7897");
             User user9 = CreateUser("François", "1234567489", "USER", "François", "Rodriguez", "francois.rodriguez@example.com", "123-456-7898");
             User user0 = CreateUser("Michel", "1234567489", "USER", "Michel", "Hernandez", "michel.hernandez@example.com", "123-456-7899");
-
+          
             userService.saveAll(List.of(user1, user2, user3, user4, user5, user6, user7, user8, user9, user0));
         };
 
     }
 
-    private User CreateUser(String username, String password, String role, String firstName, String lastName, String email, String phone) {
+    @Bean
+    CommandLineRunner InitCategories(CategoryService categoryService) {
+        return args -> {
+            Category category1 = CreateCategory("Rent");
+            Category category2 = CreateCategory("Food");
+            Category category3 = CreateCategory("Entertainment");
+
+            categoryService.saveAll(List.of(category1, category2, category3));
+        };
+
+    }
+
+    private User CreateUser(String username, String password, String role, String firstName, String lastName,
+            String email, String phone) {
         return new User(username, password, role, firstName, lastName, email, phone);
+    }
+
+    private Category CreateCategory(String name) {
+        return new Category(name);
     }
 }
