@@ -12,6 +12,9 @@ import lombok.*;
 @Table(name = "users")
 public class User {
 
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_USER = "USER";
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false, unique = true)
@@ -23,6 +26,7 @@ public class User {
     private String lastName;
     private String email;
     private String phone;
+
 
 
     public User(String username, String password, String role, String firstName, String lastName, String email, String phone) {

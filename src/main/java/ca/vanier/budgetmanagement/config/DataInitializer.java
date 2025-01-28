@@ -21,7 +21,7 @@ public class DataInitializer {
     @Bean
     CommandLineRunner Init(UserService userService) {
         return args -> {
-            User user1 = CreateUser("Jean", "1234567489", "USER", "Jean", "Doe", "jean.doe@example.com", "123-456-7890");
+            User user1 = CreateUser("admin", "admin", "ADMIN", "admin", "admin", "admin@budgetmanagement.vanier.ca", "999-999-99999");
             User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com", "123-456-7891");
             User user3 = CreateUser("Jacques", "1234567489", "USER", "Jacques", "Brown", "jacques.brown@example.com", "123-456-7892");
             User user4 = CreateUser("Marie", "1234567489", "USER", "Marie", "Johnson", "marie.johnson@example.com", "123-456-7893");
