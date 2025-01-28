@@ -2,6 +2,8 @@ package ca.vanier.budgetmanagement.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -27,6 +29,9 @@ public class User {
     private String email;
     private String phone;
 
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 
 
     public User(String username, String password, String role, String firstName, String lastName, String email, String phone) {
