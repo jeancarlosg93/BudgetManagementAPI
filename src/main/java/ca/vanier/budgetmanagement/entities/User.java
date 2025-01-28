@@ -1,14 +1,10 @@
 package ca.vanier.budgetmanagement.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 import lombok.ToString;
 
-@NoArgsConstructor
-@Getter
-@Setter
+
 @ToString
 @Entity
 @Table(name = "users")
@@ -16,12 +12,39 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
     private String username;
-
     private String password;
+
+
+    public User() {
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 //    @OneToMany(cascade = CascadeType.ALL,
 //    mappedBy = "user")

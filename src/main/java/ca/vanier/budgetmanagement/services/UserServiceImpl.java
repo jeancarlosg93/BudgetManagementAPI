@@ -16,6 +16,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) {
+
+        if (user.getId() != null) {
+            throw new IllegalArgumentException("User cannot be null or empty");
+        }
+
         return userRepository.save(user);
     }
 
