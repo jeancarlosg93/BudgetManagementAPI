@@ -29,7 +29,7 @@ public class ApplicationSecurityConfiguration {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/index.html", "/h2-console/**").permitAll()
+                        .requestMatchers("/save", "/h2-console/**").permitAll()
                         .anyRequest().authenticated())
 
                 .httpBasic(Customizer.withDefaults())

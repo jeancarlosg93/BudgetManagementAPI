@@ -16,26 +16,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) {
-        return null;
+        return userRepository.save(user);
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return Optional.empty();
+        return userRepository.findById(id);
     }
 
     @Override
     public User updateExistingUser(Long id, User userDetails) {
-        return null;
+
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.save(user);
+
     }
 
     @Override
     public List<User> findAll() {
-        return null;
+        return userRepository.findAll();
     }
 
     @Override
     public void deleteUser(Long id) {
-
+        userRepository.deleteById(id);
     }
 }
