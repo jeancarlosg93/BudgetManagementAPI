@@ -32,3 +32,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+## Logs ###
+logs/
+
+## Database ##
+budgetmanagement.mv.db
+budgetmanagement.trace.db
