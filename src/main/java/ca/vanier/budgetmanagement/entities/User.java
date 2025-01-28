@@ -2,6 +2,8 @@ package ca.vanier.budgetmanagement.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -11,6 +13,9 @@ import lombok.*;
 @Entity
 @Table(name = "users")
 public class User {
+
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_USER = "USER";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -23,6 +28,10 @@ public class User {
     private String lastName;
     private String email;
     private String phone;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 
 
     public User(String username, String password, String role, String firstName, String lastName, String email, String phone) {

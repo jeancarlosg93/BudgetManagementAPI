@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
 
@@ -25,7 +25,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         try {
             return new ResponseEntity<>(userService.updateExistingUser(id, userDetails), HttpStatus.OK);
@@ -34,7 +34,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
