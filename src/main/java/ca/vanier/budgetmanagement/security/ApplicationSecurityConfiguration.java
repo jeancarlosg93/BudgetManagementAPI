@@ -14,7 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class ApplicationSecurityConfiguration {
 
+    private final PasswordEncoder passwordEncoder;
+
+
     public ApplicationSecurityConfiguration(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
@@ -25,7 +29,7 @@ public class ApplicationSecurityConfiguration {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/index.html", "/h2-console").permitAll()
+                        .requestMatchers("/index.html", "/h2-console/**").permitAll()
                         .anyRequest().authenticated())
 
                 .httpBasic(Customizer.withDefaults())
@@ -35,9 +39,9 @@ public class ApplicationSecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(InMemoryUserDetailsManager inMemoryUserDetailsManager) {
+    public UserDetailsService userDetailsService() {
         var user = org.springframework.security.core.userdetails.User.withUsername("user")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .roles("USER")
                 .build();
         return new InMemoryUserDetailsManager(user);
