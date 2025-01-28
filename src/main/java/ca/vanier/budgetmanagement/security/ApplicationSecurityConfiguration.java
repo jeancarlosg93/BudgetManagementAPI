@@ -40,9 +40,9 @@ public class ApplicationSecurityConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        var user = org.springframework.security.core.userdetails.User.withUsername("user")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
+        var user = org.springframework.security.core.userdetails.User.withUsername("admin")
+                .password(passwordEncoder.encode("admin"))
+                .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(user);
     }
