@@ -1,27 +1,24 @@
 package ca.vanier.budgetmanagement.config;
 
 import ca.vanier.budgetmanagement.entities.User;
-import ca.vanier.budgetmanagement.repositories.UserRepository;
+import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
-
 import org.springframework.context.annotation.Bean;
-
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class DataInitializer {
 
-    UserRepository userRepository = null;
+    UserService userService;
 
-    public DataInitializer(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public DataInitializer(UserService userService) {
+        this.userService = userService;
     }
 
     @Bean
-    CommandLineRunner Init() {
+    CommandLineRunner Init(UserService userService) {
         return args -> {
             User user1 = CreateUser("Jean", "1234567489");
             User user2 = CreateUser("Paul", "1234567489");
@@ -35,7 +32,7 @@ public class DataInitializer {
             User user0 = CreateUser("Michel", "1234567489");
 
 
-            userRepository.saveAll(List.of(user1, user2, user3, user4, user5, user6, user7, user8, user9, user0));
+            userService.saveAll(List.of(user1, user2, user3, user4, user5, user6, user7, user8, user9, user0));
         };
     }
 

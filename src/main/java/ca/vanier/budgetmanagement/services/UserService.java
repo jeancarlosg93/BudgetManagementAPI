@@ -9,6 +9,8 @@ public interface UserService {
 
     User save(User user);
 
+    void saveAll(List<User> users);
+
     Optional<User> findById(Long id);
 
     User updateExistingUser(Long id, User userDetails);
@@ -16,4 +18,5 @@ public interface UserService {
     List<User> findAll();
 
     void deleteUser(Long id);
+
 }

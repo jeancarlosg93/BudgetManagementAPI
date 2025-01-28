@@ -2,10 +2,6 @@ package ca.vanier.budgetmanagement.entities;
 
 import jakarta.persistence.*;
 
-import lombok.ToString;
-
-
-@ToString
 @Entity
 @Table(name = "users")
 public class User {
@@ -49,6 +45,15 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + getId() +
+                ", username='" + getUsername() + '\'' +
+                ", password='" + getPassword() + '\'' +
+                '}';
     }
 
 //    @OneToMany(cascade = CascadeType.ALL,
