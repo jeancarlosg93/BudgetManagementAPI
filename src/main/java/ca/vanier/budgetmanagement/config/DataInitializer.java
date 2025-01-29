@@ -5,10 +5,12 @@ import ca.vanier.budgetmanagement.entities.Income;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.services.CategoryService;
 import ca.vanier.budgetmanagement.services.IncomeService;
+import ca.vanier.budgetmanagement.entities.ExpenseCategory;
+import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.core.annotation.Order;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
@@ -23,11 +25,13 @@ public class DataInitializer {
     UserService userService;
     CategoryService categoryService;
     IncomeService incomeService;
-
-    public DataInitializer(UserService userService, CategoryService categoryService, IncomeService incomeService) {
+    ExpenseCategoryService expenseCategoryService;
+    
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,IncomeService incomeService,IncomeService incomeService) {
         this.incomeService = incomeService;
         this.userService = userService;
-        this.categoryService = categoryService;
+        this.expenseCategoryService = expenseCategoryService;
+        this.incomeService = incomeService
     }
 
     @Bean
@@ -37,9 +41,7 @@ public class DataInitializer {
             User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com", "123-456-7891");
             User user3 = CreateUser("Jacques", "1234567489", "ADMIN", "Jacques", "Brown", "jacques.brown@example.com", "123-456-7892");
 
-
             userService.saveAll(List.of(user1, user2, user3));
-
 
             Income income1 = CreateIncome(5000.00, "Monthly salary", user1, LocalDate.now());
             income1.setType(SALARY);
@@ -53,13 +55,18 @@ public class DataInitializer {
     }
 
     @Bean
-    CommandLineRunner InitCategories(CategoryService categoryService) {
-        return args -> {
-            Category category1 = CreateCategory("Rent");
-            Category category2 = CreateCategory("Food");
-            Category category3 = CreateCategory("Entertainment");
+    CommandLineRunner InitExpenseCategories(ExpenseCategoryService categoryService) {
 
-            categoryService.saveAll(List.of(category1, category2, category3));
+        return args -> {
+            ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
+            ExpenseCategory category2 = CreateExpenseCategory("Food",
+                    (long) 2);
+            ExpenseCategory category3 = CreateExpenseCategory("Entertainment",
+                    (long) 3);
+
+            List<ExpenseCategory> expenseCategories = List.of(category1, category2,
+                    category3);
+            expenseCategories.forEach(expenseCategory -> expenseCategoryService.save(expenseCategory));
         };
 
     }
@@ -69,8 +76,8 @@ public class DataInitializer {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
-    private Category CreateCategory(String name) {
-        return new Category(name);
+    private ExpenseCategory CreateExpenseCategory(String name, Long userId) {
+        return new ExpenseCategory(name, userId);
     }
 
     private Income CreateIncome(double amount, String description, User user, LocalDate date) {

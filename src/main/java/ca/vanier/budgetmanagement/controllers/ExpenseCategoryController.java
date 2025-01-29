@@ -1,18 +1,18 @@
 package ca.vanier.budgetmanagement.controllers;
 
-import ca.vanier.budgetmanagement.entities.Category;
-import ca.vanier.budgetmanagement.services.CategoryService;
+import ca.vanier.budgetmanagement.entities.ExpenseCategory;
+import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/category")
-public class CategoryController {
+@RequestMapping("/api/expense-category")
+public class ExpenseCategoryController {
 
     @Autowired
-    private CategoryService categoryService;
+    private ExpenseCategoryService categoryService;
 
     @GetMapping("/all")
     public ResponseEntity<?> findAll() {
@@ -25,9 +25,11 @@ public class CategoryController {
     }
 
     @PutMapping("update/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
+    public ResponseEntity<?> updateExpenseCategory(@PathVariable Long id,
+            @RequestBody ExpenseCategory categoryDetails) {
         try {
-            return new ResponseEntity<>(categoryService.updateExistingCategory(id, categoryDetails), HttpStatus.OK);
+            return new ResponseEntity<>(categoryService.updateExistingExpenseCategory(id, categoryDetails),
+                    HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -38,22 +40,22 @@ public class CategoryController {
         try {
             return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Category with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("ExpenseCategory with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable long id) {
+    public ResponseEntity<?> deleteExpenseCategory(@PathVariable long id) {
         try {
-            categoryService.deleteCategory(id);
-            return new ResponseEntity<>("Category deleted successfully", HttpStatus.OK);
+            categoryService.deleteExpenseCategory(id);
+            return new ResponseEntity<>("ExpenseCategory deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error deleting the category", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody Category category) {
+    public ResponseEntity<?> save(@RequestBody ExpenseCategory category) {
         try {
             return new ResponseEntity<>(categoryService.save(category), HttpStatus.CREATED);
         } catch (Exception e) {
