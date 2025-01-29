@@ -1,6 +1,4 @@
 package ca.vanier.budgetmanagement.config;
-
-import ca.vanier.budgetmanagement.entities.Category;
 import ca.vanier.budgetmanagement.entities.Income;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.services.IncomeService;
@@ -9,7 +7,6 @@ import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
