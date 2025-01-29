@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +41,9 @@ public class IncomeServiceImpl implements IncomeService {
     @Transactional
     @Override
     public void deleteIncome(Long id) {
-        Income income = findById(id).orElseThrow(() -> new IllegalArgumentException("Income id not found"));
+        Income income = findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Income not found"));
+
         if (income.getUser() != null) {
             income.getUser().getIncomes().remove(income);
             income.setUser(null);
@@ -52,16 +55,21 @@ public class IncomeServiceImpl implements IncomeService {
     @Transactional
     @Override
     public Income updateExistingIncome(Long id, Income incomeDetails) {
+
         Income existingIncome = findById(id).orElseThrow(() -> new IllegalArgumentException("Income not found"));
+
         if (incomeDetails.getUser() != null && !incomeDetails.getUser().getId().equals(existingIncome.getUser().getId())) {
             if (existingIncome.getUser() != null) {
                 existingIncome.getUser().getIncomes().remove(existingIncome);
             }
 
         }
+
         User newUser = userService.findById(incomeDetails.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
         newUser.getIncomes().add(existingIncome);
         existingIncome.setUser(newUser);
+
+        existingIncome.setAmount(incomeDetails.getAmount());
         existingIncome.setDescription(incomeDetails.getDescription());
         existingIncome.setDate(incomeDetails.getDate());
         existingIncome.setType(incomeDetails.getType());
@@ -76,11 +84,9 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public List<Income> findByUserId(Long userId) {
-
-        User user = userService.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
-        Optional<Income> incomes = findById(user.getId());
-        return incomes.map(List::of).orElseGet(List::of);
-
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        return new ArrayList<>(user.getIncomes());
 
     }
 }
