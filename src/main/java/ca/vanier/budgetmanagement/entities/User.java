@@ -28,6 +28,7 @@ public class User {
     private Long id;
     private String username;
     @JsonIgnore
+    @ToString.Exclude
     private String password;
     private String role;
     private String firstName;
