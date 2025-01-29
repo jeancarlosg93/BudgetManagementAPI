@@ -3,7 +3,6 @@ package ca.vanier.budgetmanagement.config;
 import ca.vanier.budgetmanagement.entities.Category;
 import ca.vanier.budgetmanagement.entities.Income;
 import ca.vanier.budgetmanagement.entities.User;
-import ca.vanier.budgetmanagement.services.CategoryService;
 import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
@@ -23,15 +22,13 @@ import static ca.vanier.budgetmanagement.entities.IncomeType.SALARY;
 public class DataInitializer {
 
     UserService userService;
-    CategoryService categoryService;
     IncomeService incomeService;
     ExpenseCategoryService expenseCategoryService;
-    
-    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,IncomeService incomeService,IncomeService incomeService) {
-        this.incomeService = incomeService;
+
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService, IncomeService incomeService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
-        this.incomeService = incomeService
+        this.incomeService = incomeService;
     }
 
     @Bean
