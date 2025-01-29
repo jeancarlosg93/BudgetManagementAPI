@@ -1,5 +1,7 @@
 package ca.vanier.budgetmanagement.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,6 +27,7 @@ public class User {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
     private String username;
+    @JsonIgnore
     private String password;
     private String role;
     private String firstName;
@@ -32,15 +35,16 @@ public class User {
     private String email;
     private String phone;
 
-    @OneToMany(cascade = CascadeType.ALL,
-    mappedBy = "user",
-    orphanRemoval = true)
-    @ToString.Exclude
-    private List<Income> incomes = new ArrayList<>();
-
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL,
+            mappedBy = "user",
+            orphanRemoval = true)
+    @ToString.Exclude
+    private List<Income> incomes = new ArrayList<>();
 
 
     public User(String username, String password, String role, String firstName, String lastName, String email, String phone) {
@@ -52,7 +56,6 @@ public class User {
         this.email = email;
         this.phone = phone;
     }
-
 
 
 }
