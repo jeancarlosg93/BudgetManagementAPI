@@ -3,7 +3,10 @@ package ca.vanier.budgetmanagement.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,6 +32,12 @@ public class User {
     private String email;
     private String phone;
 
+    @OneToMany(cascade = CascadeType.ALL,
+    mappedBy = "user",
+    orphanRemoval = true)
+    @ToString.Exclude
+    private List<Income> incomes = new ArrayList<>();
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
@@ -44,9 +53,6 @@ public class User {
         this.phone = phone;
     }
 
-//    @OneToMany(cascade = CascadeType.ALL,
-//    mappedBy = "user")
-//    private List<Budget> budget;
 
 
 }
