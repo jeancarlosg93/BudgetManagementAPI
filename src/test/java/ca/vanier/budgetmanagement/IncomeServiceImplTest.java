@@ -3,7 +3,7 @@ package ca.vanier.budgetmanagement;
 import ca.vanier.budgetmanagement.entities.Income;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.repositories.IncomeRepository;
-import ca.vanier.budgetmanagement.services.IncomeServiceImpl;
+import ca.vanier.budgetmanagement.services.impl.IncomeServiceImpl;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static ca.vanier.budgetmanagement.entities.IncomeType.BONUS;
 import static ca.vanier.budgetmanagement.entities.IncomeType.SALARY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,6 +68,8 @@ class IncomeServiceImplTest {
                 LocalDate.now()
         );
         secondIncome.setId(2L);
+        secondIncome.setType(SALARY);
+
 
         testIncomes = new ArrayList<>();
         testIncomes.add(testIncome);
@@ -114,7 +117,7 @@ class IncomeServiceImplTest {
 
         // Assert
         assertFalse(found.isEmpty());
-        assertEquals(2, found.size());
+        assertEquals(3, found.size());
         verify(incomeRepository).findAll();
     }
 
@@ -142,6 +145,7 @@ class IncomeServiceImplTest {
                 LocalDate.now()
         );
         updatedIncome.setId(testIncome.getId());
+        updatedIncome.setType(SALARY);
 
         when(incomeRepository.findById(testIncome.getId())).thenReturn(Optional.of(testIncome));
         when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
@@ -154,6 +158,7 @@ class IncomeServiceImplTest {
         assertNotNull(result);
         assertEquals(updatedIncome.getAmount(), result.getAmount());
         assertEquals(updatedIncome.getDescription(), result.getDescription());
+        assertEquals(updatedIncome.getType(), result.getType());
         verify(incomeRepository).save(any(Income.class));
     }
 
@@ -206,5 +211,180 @@ class IncomeServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> {
             incomeService.findByUserId(99L);
         });
+
+    }
+
+    @Test
+    void whenFindByUserIdAndMonth_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndMonth(testUser.getId(), 3);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> assertEquals(3, income.getDate().getMonthValue()));
+    }
+
+    @Test
+    void whenFindByUserIdAndMonth_withInvalidMonth_thenThrowException() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () ->
+                incomeService.findByUserIdAndMonth(testUser.getId(), 13));
+    }
+
+    @Test
+    void whenFindByUserIdAndYear_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndYear(testUser.getId(), 2024);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> assertEquals(2024, income.getDate().getYear()));
+    }
+
+    @Test
+    void whenFindByUserIdAndYear_withInvalidYear_thenThrowException() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () ->
+                incomeService.findByUserIdAndYear(testUser.getId(), 1800));
+    }
+
+    @Test
+    void whenFindByUserIdAndMonthAndYear_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndMonthAndYear(testUser.getId(), 3, 2024);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> {
+            assertEquals(3, income.getDate().getMonthValue());
+            assertEquals(2024, income.getDate().getYear());
+        });
+    }
+
+    @Test
+    void whenFindByUserIdAndIncomeType_thenReturnFilteredIncomes() {
+        // Arrange
+        testIncome.setType(SALARY);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndIncomeType(testUser.getId(), "SALARY");
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> assertEquals(SALARY, income.getType()));
+    }
+
+    @Test
+    void whenFindByUserIdAndIncomeType_withInvalidType_thenThrowException() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () ->
+                incomeService.findByUserIdAndIncomeType(testUser.getId(), "INVALID_TYPE"));
+    }
+
+    @Test
+    void whenFindByUserIdAndMonthAndYearAndIncomeType_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        testIncome.setType(SALARY);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndMonthAndYearAndIncomeType(
+                testUser.getId(), 3, 2024, "SALARY");
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> {
+            assertEquals(3, income.getDate().getMonthValue());
+            assertEquals(2024, income.getDate().getYear());
+            assertEquals(SALARY, income.getType());
+        });
+    }
+
+    @Test
+    void whenFindByUserIdAndMonthAndYearAndIncomeType_withNoMatches_thenReturnEmptyList() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        testIncome.setType(SALARY);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndMonthAndYearAndIncomeType(
+                testUser.getId(), 4, 2024, "SALARY");
+
+        // Assert
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
+    void whenFindByUserIdAndIncomeTypeAndMonth_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        testIncome.setType(SALARY);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndIncomeTypeAndMonth(
+                testUser.getId(), "SALARY", 3);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> {
+            assertEquals(3, income.getDate().getMonthValue());
+            assertEquals(SALARY, income.getType());
+        });
+    }
+
+    @Test
+    void whenFindByUserIdAndIncomeTypeAndYear_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate date = LocalDate.of(2024, 3, 15);
+        testIncome.setDate(date);
+        testIncome.setType(SALARY);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findByUserIdAndIncomeTypeAndYear(
+                testUser.getId(), "SALARY", 2024);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        found.forEach(income -> {
+            assertEquals(2024, income.getDate().getYear());
+            assertEquals(SALARY, income.getType());
+        });
+    }
+
+    @BeforeEach
+    void addMoreTestData() {
+        // Add income with different month/year/type for better testing
+        Income differentIncome = new Income(
+                4000.00,
+                "Different Month Income",
+                testUser,
+                LocalDate.of(2024, 4, 15)
+        );
+        differentIncome.setId(3L);
+        differentIncome.setType(BONUS);
+        testIncomes.add(differentIncome);
     }
 }

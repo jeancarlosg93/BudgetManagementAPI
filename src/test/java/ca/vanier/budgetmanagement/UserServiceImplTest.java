@@ -2,7 +2,7 @@ package ca.vanier.budgetmanagement;
 
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.repositories.UserRepository;
-import ca.vanier.budgetmanagement.services.UserServiceImpl;
+import ca.vanier.budgetmanagement.services.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

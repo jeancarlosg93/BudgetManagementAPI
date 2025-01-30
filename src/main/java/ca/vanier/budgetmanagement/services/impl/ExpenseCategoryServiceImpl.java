@@ -1,5 +1,6 @@
-package ca.vanier.budgetmanagement.services;
+package ca.vanier.budgetmanagement.services.impl;
 
+import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.repositories.ExpenseCategoryRepository;
