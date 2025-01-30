@@ -26,8 +26,8 @@ public class ExpenseCategory {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // Foreign key column in the expense_categories table
-    private User user; // Replaced Long userId with a User entity reference
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public ExpenseCategory(String name, User user) {
         this.name = name;
