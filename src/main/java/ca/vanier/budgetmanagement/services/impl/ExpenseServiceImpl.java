@@ -52,6 +52,23 @@ public class ExpenseServiceImpl implements ExpenseService {
             }
         }
 
+        if (expense.getCategory() != null) {
+            try {
+                ExpenseCategory category = expenseCategoryService.findById(expense.getCategory().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("ExpenseCategory not found"));
+                ExpenseValidator.validateExpenseCategory(category.getUser().getId(),expense.getUser().getId());
+                expense.setCategory(category);
+                GlobalLogger.info(ExpenseServiceImpl.class, "Associated expense with expenseCategory id: {}",
+                        category.getId());
+            } catch (IllegalArgumentException e) {
+                GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenseCategory for expense: {}", e.getMessage());
+                throw e;
+            }
+        }
+
+
+        
+
         Expense savedExpense = expenseRepository.save(expense);
         GlobalLogger.info(ExpenseServiceImpl.class, "Expense saved successfully with id: {}", savedExpense.getId());
         return savedExpense;
