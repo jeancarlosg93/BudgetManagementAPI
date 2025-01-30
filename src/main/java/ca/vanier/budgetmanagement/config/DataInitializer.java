@@ -29,7 +29,8 @@ public class DataInitializer {
     ReportService reportService;
     ExpenseService expenseService;
 
-    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService, IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,
+            IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
@@ -60,13 +61,6 @@ public class DataInitializer {
             CreateReport(user1, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
-        };
-
-    }
-
-    @Bean
-    CommandLineRunner InitExpenseCategories(ExpenseCategoryService categoryService) {
-
 
             ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
             ExpenseCategory category2 = CreateExpenseCategory("Food",
