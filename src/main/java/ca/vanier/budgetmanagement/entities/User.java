@@ -47,6 +47,12 @@ public class User {
     @ToString.Exclude
     private List<Income> incomes = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL,
+            mappedBy = "user",
+            orphanRemoval = true)
+    @ToString.Exclude
+    private List<Report> reports = new ArrayList<>();
+
 
     public User(String username, String password, String role, String firstName, String lastName, String email, String phone) {
         this.username = username;

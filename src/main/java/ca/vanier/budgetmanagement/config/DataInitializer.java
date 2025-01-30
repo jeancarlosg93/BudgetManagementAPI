@@ -1,9 +1,12 @@
 package ca.vanier.budgetmanagement.config;
+
 import ca.vanier.budgetmanagement.entities.Income;
+import ca.vanier.budgetmanagement.entities.Report;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
+import ca.vanier.budgetmanagement.services.ReportService;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +24,13 @@ public class DataInitializer {
     UserService userService;
     IncomeService incomeService;
     ExpenseCategoryService expenseCategoryService;
+    ReportService reportService;
 
-    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService, IncomeService incomeService) {
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService, IncomeService incomeService, ReportService reportService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
+        this.reportService = reportService;
     }
 
     @Bean
@@ -37,13 +42,17 @@ public class DataInitializer {
 
             userService.saveAll(List.of(user1, user2, user3));
 
-            Income income1 = CreateIncome(5000.00, "Monthly salary", user1, LocalDate.now());
+            Income income1 = CreateIncome(5000.00, "Monthly salary", user1, LocalDate.now().minusDays(3));
             income1.setType(SALARY);
-            Income income2 = CreateIncome(3000.00, "Year's end bonus", user2, LocalDate.now());
+            Income income2 = CreateIncome(3000.00, "Year's end bonus", user2, LocalDate.now().minusDays(2));
             income2.setType(BONUS);
 
             incomeService.save(income1);
             incomeService.save(income2);
+
+            CreateReport(user1, LocalDate.now().minusMonths(1), LocalDate.now());
+            CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
+            CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
         };
 
     }
@@ -77,5 +86,9 @@ public class DataInitializer {
     private Income CreateIncome(double amount, String description, User user, LocalDate date) {
         return new Income(amount, description, user, date);
 
+    }
+
+    private void CreateReport(User user, LocalDate startDate, LocalDate endDate) {
+        reportService.createReport(user.getId(), startDate, endDate);
     }
 }

@@ -109,7 +109,7 @@ public class IncomeServiceImpl implements IncomeService {
             existingIncome.setDate(incomeDetails.getDate());
             existingIncome.setType(incomeDetails.getType());
 
-            Income updatedIncome = incomeRepository.save(incomeDetails);
+            Income updatedIncome = incomeRepository.save(existingIncome);
             GlobalLogger.info(IncomeServiceImpl.class, "Income updated successfully: {}", updatedIncome);
             return updatedIncome;
         } catch (IllegalArgumentException e) {
