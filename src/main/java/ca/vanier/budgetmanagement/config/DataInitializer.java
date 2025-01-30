@@ -1,9 +1,13 @@
 package ca.vanier.budgetmanagement.config;
+
 import ca.vanier.budgetmanagement.entities.Income;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
+import ca.vanier.budgetmanagement.entities.Expense;
+import ca.vanier.budgetmanagement.services.ExpenseService;
+
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -21,19 +25,25 @@ public class DataInitializer {
     UserService userService;
     IncomeService incomeService;
     ExpenseCategoryService expenseCategoryService;
+    ExpenseService expenseService;
 
-    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService, IncomeService incomeService) {
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,
+            IncomeService incomeService, ExpenseService expenseService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
+        this.expenseService = expenseService;
     }
 
     @Bean
-    CommandLineRunner InitUsers(UserService userService) {
+    CommandLineRunner Init(UserService userService) {
         return args -> {
-            User user1 = CreateUser("admin", "admin", "ADMIN", "admin", "admin", "admin@budgetmanagement.vanier.ca", "999-999-99999");
-            User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com", "123-456-7891");
-            User user3 = CreateUser("Jacques", "1234567489", "ADMIN", "Jacques", "Brown", "jacques.brown@example.com", "123-456-7892");
+            User user1 = CreateUser("admin", "admin", "ADMIN", "admin", "admin", "admin@budgetmanagement.vanier.ca",
+                    "999-999-99999");
+            User user2 = CreateUser("Paul", "1234567489", "USER", "Paul", "Smith", "paul.smith@example.com",
+                    "123-456-7891");
+            User user3 = CreateUser("Jacques", "1234567489", "ADMIN", "Jacques", "Brown", "jacques.brown@example.com",
+                    "123-456-7892");
 
             userService.saveAll(List.of(user1, user2, user3));
 
@@ -44,14 +54,7 @@ public class DataInitializer {
 
             incomeService.save(income1);
             incomeService.save(income2);
-        };
 
-    }
-
-    @Bean
-    CommandLineRunner InitExpenseCategories(ExpenseCategoryService categoryService) {
-
-        return args -> {
             ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
             ExpenseCategory category2 = CreateExpenseCategory("Food",
                     (long) 2);
@@ -61,12 +64,23 @@ public class DataInitializer {
             List<ExpenseCategory> expenseCategories = List.of(category1, category2,
                     category3);
             expenseCategories.forEach(expenseCategory -> expenseCategoryService.save(expenseCategory));
+
+            Expense expense1 = CreateExpense(2300.30, "Monthly rent", userService.findById((long) 1).get(),
+                    LocalDate.now(), category1);
+            Expense expense2 = CreateExpense(343.23, "Fine dining", userService.findById((long) 2).get(),
+                    LocalDate.now(), category2);
+            Expense expense3 = CreateExpense(40.25, "Concert ticket", userService.findById((long) 3).get(),
+                    LocalDate.now(), category3);
+
+            List<Expense> expenses = List.of(expense1, expense2, expense3);
+            expenses.forEach(expense -> expenseService.save(expense));
+
         };
 
     }
 
     private User CreateUser(String username, String password, String role, String firstName, String lastName,
-                            String email, String phone) {
+            String email, String phone) {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
@@ -76,6 +90,10 @@ public class DataInitializer {
 
     private Income CreateIncome(double amount, String description, User user, LocalDate date) {
         return new Income(amount, description, user, date);
+    }
 
+    private Expense CreateExpense(double amount, String description, User user, LocalDate date,
+            ExpenseCategory category) {
+        return new Expense(amount, description, user, date, category);
     }
 }
