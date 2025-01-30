@@ -41,14 +41,17 @@ public class User {
     private LocalDateTime createdAt;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user",
-            orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
     private List<Income> incomes = new ArrayList<>();
 
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    @ToString.Exclude
+    private List<Expense> expenses = new ArrayList<>();
 
-    public User(String username, String password, String role, String firstName, String lastName, String email, String phone) {
+    public User(String username, String password, String role, String firstName, String lastName, String email,
+            String phone) {
         this.username = username;
         this.password = password;
         this.role = role;
@@ -57,6 +60,5 @@ public class User {
         this.email = email;
         this.phone = phone;
     }
-
 
 }
