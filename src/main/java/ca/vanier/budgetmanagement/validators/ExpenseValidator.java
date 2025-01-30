@@ -41,7 +41,7 @@ public class ExpenseValidator {
         validateAmount(expense.getAmount());
         validateMonth(expense.getDate().getMonthValue());
         validateYear(expense.getDate().getYear());
-        validateExpenseCategory(expense.getCategory().getUserId(), expense.getUser().getId());
+        validateExpenseCategory(expense.getCategory().getUser().getId(), expense.getUser().getId());
     }
 
     public static void validateExpenseCategory(Long expenseCategoryUserId, Long userId) {

@@ -62,11 +62,11 @@ public class DataInitializer {
             CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
 
-            ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
+            ExpenseCategory category1 = CreateExpenseCategory("Rent", user1);
             ExpenseCategory category2 = CreateExpenseCategory("Food",
-                    (long) 2);
+                    user2);
             ExpenseCategory category3 = CreateExpenseCategory("Entertainment",
-                    (long) 3);
+                    user3);
 
             List<ExpenseCategory> expenseCategories = List.of(category1, category2,
                     category3);
@@ -91,8 +91,8 @@ public class DataInitializer {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
-    private ExpenseCategory CreateExpenseCategory(String name, Long userId) {
-        return new ExpenseCategory(name, userId);
+    private ExpenseCategory CreateExpenseCategory(String name, User user) {
+        return new ExpenseCategory(name, user);
     }
 
     private Income CreateIncome(double amount, String description, User user, LocalDate date) {
