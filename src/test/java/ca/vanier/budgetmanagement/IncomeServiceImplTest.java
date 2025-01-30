@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static ca.vanier.budgetmanagement.entities.IncomeType.BONUS;
-import static ca.vanier.budgetmanagement.entities.IncomeType.SALARY;
+import static ca.vanier.budgetmanagement.entities.IncomeType.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -56,19 +55,19 @@ class IncomeServiceImplTest {
                 5000.00,
                 "Monthly Salary",
                 testUser,
-                LocalDate.now()
+                LocalDate.now(),
+                SALARY
         );
         testIncome.setId(1L);
-        testIncome.setType(SALARY);
 
         Income secondIncome = new Income(
                 3000.00,
                 "Part-time work",
                 testUser,
-                LocalDate.now()
+                LocalDate.now(),
+                BONUS
         );
         secondIncome.setId(2L);
-        secondIncome.setType(SALARY);
 
 
         testIncomes = new ArrayList<>();
@@ -142,7 +141,8 @@ class IncomeServiceImplTest {
                 6000.00,
                 "Updated Salary",
                 testUser,
-                LocalDate.now()
+                LocalDate.now(),
+                DIVIDEND
         );
         updatedIncome.setId(testIncome.getId());
         updatedIncome.setType(SALARY);
@@ -381,7 +381,8 @@ class IncomeServiceImplTest {
                 4000.00,
                 "Different Month Income",
                 testUser,
-                LocalDate.of(2024, 4, 15)
+                LocalDate.of(2024, 4, 15),
+                DIVIDEND
         );
         differentIncome.setId(3L);
         differentIncome.setType(BONUS);

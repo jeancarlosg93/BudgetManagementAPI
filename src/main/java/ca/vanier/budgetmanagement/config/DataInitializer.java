@@ -1,13 +1,9 @@
 package ca.vanier.budgetmanagement.config;
 
-import ca.vanier.budgetmanagement.entities.Income;
-import ca.vanier.budgetmanagement.entities.Report;
-import ca.vanier.budgetmanagement.entities.User;
+import ca.vanier.budgetmanagement.entities.*;
 import ca.vanier.budgetmanagement.services.IncomeService;
-import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.services.ReportService;
-import ca.vanier.budgetmanagement.entities.Expense;
 import ca.vanier.budgetmanagement.services.ExpenseService;
 import ca.vanier.budgetmanagement.services.UserService;
 import org.springframework.boot.CommandLineRunner;
@@ -17,8 +13,7 @@ import org.springframework.context.annotation.Bean;
 import java.time.LocalDate;
 import java.util.List;
 
-import static ca.vanier.budgetmanagement.entities.IncomeType.BONUS;
-import static ca.vanier.budgetmanagement.entities.IncomeType.SALARY;
+import static ca.vanier.budgetmanagement.entities.IncomeType.*;
 
 @Configuration
 public class DataInitializer {
@@ -29,7 +24,8 @@ public class DataInitializer {
     ReportService reportService;
     ExpenseService expenseService;
 
-    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService, IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
+    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,
+                           IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
@@ -49,33 +45,47 @@ public class DataInitializer {
 
             userService.saveAll(List.of(user1, user2, user3));
 
-            Income income1 = CreateIncome(5000.00, "Monthly salary", user1, LocalDate.now().minusDays(3));
-            income1.setType(SALARY);
-            Income income2 = CreateIncome(3000.00, "Year's end bonus", user2, LocalDate.now().minusDays(2));
-            income2.setType(BONUS);
 
-            incomeService.save(income1);
-            incomeService.save(income2);
+            List<Income> user1Incomes = List.of(
+                    CreateIncome(5000.00, "Monthly salary", user1, LocalDate.now().minusDays(3), SALARY),
+                    CreateIncome(2000.00, "Investment returns", user1, LocalDate.now().minusDays(15), INTEREST),
+                    CreateIncome(3000.00, "Consulting work", user1, LocalDate.now().minusDays(45), OTHER),
+                    CreateIncome(500.00, "Dividend payment", user1, LocalDate.now().minusDays(20), DIVIDEND)
+            );
+
+            // User 2 Incomes
+            List<Income> user2Incomes = List.of(
+                    CreateIncome(4500.00, "Monthly salary", user2, LocalDate.now().minusDays(5), SALARY),
+                    CreateIncome(3000.00, "Year-end bonus", user2, LocalDate.now().minusDays(2), BONUS),
+                    CreateIncome(1000.00, "Rental income", user2, LocalDate.now().minusDays(10), RENT)
+            );
+
+            // User 3 Incomes
+            List<Income> user3Incomes = List.of(
+                    CreateIncome(6000.00, "Monthly salary", user3, LocalDate.now().minusDays(7), SALARY),
+                    CreateIncome(4000.00, "Performance bonus", user3, LocalDate.now().minusDays(25), BONUS),
+                    CreateIncome(2500.00, "Stock dividends", user3, LocalDate.now().minusDays(30), DIVIDEND)
+            );
+
+            user1Incomes.forEach(income -> incomeService.save(income));
+            user2Incomes.forEach(income -> incomeService.save(income));
+            user3Incomes.forEach(income -> incomeService.save(income));
 
             CreateReport(user1, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
-        };
-
-    }
-
-    @Bean
-    CommandLineRunner InitExpenseCategories(ExpenseCategoryService categoryService) {
-
 
             ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
-            ExpenseCategory category2 = CreateExpenseCategory("Food",
-                    (long) 2);
-            ExpenseCategory category3 = CreateExpenseCategory("Entertainment",
-                    (long) 3);
+            ExpenseCategory category2 = CreateExpenseCategory("Food", (long) 2);
+            ExpenseCategory category3 = CreateExpenseCategory("Entertainment", (long) 3);
+            ExpenseCategory category4 = CreateExpenseCategory("Utilities", (long) 1);
+            ExpenseCategory category5 = CreateExpenseCategory("Transportation", (long) 2);
+            ExpenseCategory category6 = CreateExpenseCategory("Shopping", (long) 3);
+
 
             List<ExpenseCategory> expenseCategories = List.of(category1, category2,
-                    category3);
+                    category3, category4, category5, category6);
+
             expenseCategories.forEach(expenseCategory -> expenseCategoryService.save(expenseCategory));
 
             Expense expense1 = CreateExpense(2300.30, "Monthly rent", userService.findById((long) 1).get(),
@@ -93,7 +103,7 @@ public class DataInitializer {
     }
 
     private User CreateUser(String username, String password, String role, String firstName, String lastName,
-            String email, String phone) {
+                            String email, String phone) {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
@@ -101,12 +111,12 @@ public class DataInitializer {
         return new ExpenseCategory(name, userId);
     }
 
-    private Income CreateIncome(double amount, String description, User user, LocalDate date) {
-        return new Income(amount, description, user, date);
+    private Income CreateIncome(double amount, String description, User user, LocalDate date, IncomeType type) {
+        return new Income(amount, description, user, date, type);
     }
 
     private Expense CreateExpense(double amount, String description, User user, LocalDate date,
-            ExpenseCategory category) {
+                                  ExpenseCategory category) {
         return new Expense(amount, description, user, date, category);
     }
 

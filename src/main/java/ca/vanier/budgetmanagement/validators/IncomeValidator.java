@@ -42,6 +42,10 @@ public class IncomeValidator {
             throw new IllegalArgumentException("Income type cannot be null");
         }
 
+        if (income.getAmount() < 0) {
+            throw new IllegalArgumentException("Income amount cannot be negative");
+        }
+
         validateAmount(income.getAmount());
         validateMonth(income.getDate().getMonthValue());
         validateYear(income.getDate().getYear());

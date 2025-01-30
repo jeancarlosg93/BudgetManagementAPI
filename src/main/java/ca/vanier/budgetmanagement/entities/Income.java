@@ -33,11 +33,12 @@ public class Income {
     private User user;
 
 
-    public Income(double amount, String description, User user, LocalDate date) {
+    public Income(double amount, String description, User user, LocalDate date, IncomeType type) {
 
         this.amount = amount;
         this.description = description;
         this.user = user;
         this.date = date;
+        this.type = type;
     }
 }

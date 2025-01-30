@@ -1,8 +1,10 @@
 package ca.vanier.budgetmanagement.services.impl;
 
+import ca.vanier.budgetmanagement.entities.Expense;
 import ca.vanier.budgetmanagement.entities.Income;
 import ca.vanier.budgetmanagement.entities.Report;
 import ca.vanier.budgetmanagement.repositories.ReportRepository;
+import ca.vanier.budgetmanagement.services.ExpenseService;
 import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.services.ReportService;
 import ca.vanier.budgetmanagement.services.UserService;
@@ -24,6 +26,8 @@ public class ReportServiceImpl implements ReportService {
     UserService userService;
     @Autowired
     IncomeService incomeService;
+    @Autowired
+    ExpenseService expenseService;
 
     @Transactional
     public Report createReport(Long userId, LocalDate startDate, LocalDate endDate) {
@@ -38,6 +42,8 @@ public class ReportServiceImpl implements ReportService {
         report.setEndDate(endDate);
 
         List<Income> allIncomes = new ArrayList<>();
+        List<Expense> allExpenses = new ArrayList<>();
+
 
         LocalDate currentDate = startDate;
 
@@ -51,17 +57,33 @@ public class ReportServiceImpl implements ReportService {
                     year
             );
 
+            List<Expense> monthlyExpenses = expenseService.findByUserIdAndMonthAndYear(
+                    userId,
+                    month,
+                    year
+            );
+
             allIncomes.addAll(monthlyIncomes);
+            allExpenses.addAll(monthlyExpenses);
+
 
             currentDate = currentDate.plusMonths(1);
         }
 
+
         report.setIncomes(allIncomes);
+        report.setExpenses(allExpenses);
 
         double totalIncome = allIncomes.stream()
                 .mapToDouble(Income::getAmount)
                 .sum();
+
+        double totalExpense = allExpenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
         report.setTotalIncome(totalIncome);
+        report.setTotalExpense(totalExpense);
 
         return reportRepository.save(report);
     }
@@ -81,12 +103,18 @@ public class ReportServiceImpl implements ReportService {
         existingReport.setStartDate(report.getStartDate());
         existingReport.setEndDate(report.getEndDate());
         existingReport.setIncomes(report.getIncomes());
+        existingReport.setExpenses(report.getExpenses());
 
 
         double totalIncome = report.getIncomes().stream()
                 .mapToDouble(Income::getAmount)
                 .sum();
         existingReport.setTotalIncome(totalIncome);
+
+        double totalExpense = report.getExpenses().stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+        existingReport.setTotalExpense(totalExpense);
 
 
         return reportRepository.save(existingReport);

@@ -33,9 +33,10 @@ public class Report {
     @ToString.Exclude
     private List<Income> incomes;
 
-//    @OneToMany
-//    @JoinTable(name = "report_expenses")
-//    private List<Expense> expenses;
+    @OneToMany
+    @JoinTable(name = "report_expenses")
+    @ToString.Exclude
+    private List<Expense> expenses;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
