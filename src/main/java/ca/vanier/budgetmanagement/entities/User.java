@@ -45,9 +45,7 @@ public class User {
     @ToString.Exclude
     private List<Income> incomes = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user",
-            orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
     private List<Report> reports = new ArrayList<>();
 
@@ -55,6 +53,11 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
     private List<Expense> expenses = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    @ToString.Exclude
+    private List<Expense> expenseCategories = new ArrayList<>();
 
     public User(String username, String password, String role, String firstName, String lastName, String email,
             String phone) {

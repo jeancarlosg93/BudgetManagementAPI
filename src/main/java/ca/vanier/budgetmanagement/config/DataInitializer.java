@@ -25,7 +25,7 @@ public class DataInitializer {
     ExpenseService expenseService;
 
     public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,
-                           IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
+            IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
@@ -75,17 +75,14 @@ public class DataInitializer {
             CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
 
-            ExpenseCategory category1 = CreateExpenseCategory("Rent", (long) 1);
-            ExpenseCategory category2 = CreateExpenseCategory("Food", (long) 2);
-            ExpenseCategory category3 = CreateExpenseCategory("Entertainment", (long) 3);
-            ExpenseCategory category4 = CreateExpenseCategory("Utilities", (long) 1);
-            ExpenseCategory category5 = CreateExpenseCategory("Transportation", (long) 2);
-            ExpenseCategory category6 = CreateExpenseCategory("Shopping", (long) 3);
-
+            ExpenseCategory category1 = CreateExpenseCategory("Rent", user1);
+            ExpenseCategory category2 = CreateExpenseCategory("Food",
+                    user2);
+            ExpenseCategory category3 = CreateExpenseCategory("Entertainment",
+                    user3);
 
             List<ExpenseCategory> expenseCategories = List.of(category1, category2,
-                    category3, category4, category5, category6);
-
+                    category3);
             expenseCategories.forEach(expenseCategory -> expenseCategoryService.save(expenseCategory));
 
             Expense expense1 = CreateExpense(2300.30, "Monthly rent", userService.findById((long) 1).get(),
@@ -103,12 +100,12 @@ public class DataInitializer {
     }
 
     private User CreateUser(String username, String password, String role, String firstName, String lastName,
-                            String email, String phone) {
+            String email, String phone) {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
-    private ExpenseCategory CreateExpenseCategory(String name, Long userId) {
-        return new ExpenseCategory(name, userId);
+    private ExpenseCategory CreateExpenseCategory(String name, User user) {
+        return new ExpenseCategory(name, user);
     }
 
     private Income CreateIncome(double amount, String description, User user, LocalDate date, IncomeType type) {
@@ -116,7 +113,7 @@ public class DataInitializer {
     }
 
     private Expense CreateExpense(double amount, String description, User user, LocalDate date,
-                                  ExpenseCategory category) {
+            ExpenseCategory category) {
         return new Expense(amount, description, user, date, category);
     }
 

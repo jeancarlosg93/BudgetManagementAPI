@@ -275,7 +275,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private Long getExpenseCategoryUserIdByExpenseCategoryId(long categoryId) {
-        return getCategory(categoryId).getUserId();
+        return getCategory(categoryId).getUser().getId();
     }
 
 }

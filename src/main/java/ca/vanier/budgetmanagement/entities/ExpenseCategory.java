@@ -1,5 +1,7 @@
 package ca.vanier.budgetmanagement.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +12,7 @@ import lombok.*;
 @ToString
 @Entity
 @Table(name = "expense_categories", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "name", "userId" })
+        @UniqueConstraint(columnNames = { "name", "user_Id" })
 })
 public class ExpenseCategory {
 
@@ -22,11 +24,13 @@ public class ExpenseCategory {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "userId", nullable = false)
-    private Long userId;
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false) // Foreign key column in the expense_categories table
+    private User user; // Replaced Long userId with a User entity reference
 
-    public ExpenseCategory(String name, Long userId) {
+    public ExpenseCategory(String name, User user) {
         this.name = name;
-        this.userId = userId;
+        this.user = user;
     }
 }
