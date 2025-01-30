@@ -23,7 +23,7 @@ public class ExpenseCategory {
     private String name;
 
     @Column(name = "userId", nullable = false)
-    private Long userId; // Ensure this matches your user ID type
+    private Long userId;
 
     public ExpenseCategory(String name, Long userId) {
         this.name = name;
