@@ -25,7 +25,7 @@ public class DataInitializer {
     ExpenseService expenseService;
 
     public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,
-            IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
+                           IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
@@ -71,9 +71,6 @@ public class DataInitializer {
             user2Incomes.forEach(income -> incomeService.save(income));
             user3Incomes.forEach(income -> incomeService.save(income));
 
-            CreateReport(user1, LocalDate.now().minusMonths(1), LocalDate.now());
-            CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
-            CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
 
             ExpenseCategory category1 = CreateExpenseCategory("Rent", user1);
             ExpenseCategory category2 = CreateExpenseCategory("Food",
@@ -85,22 +82,28 @@ public class DataInitializer {
                     category3);
             expenseCategories.forEach(expenseCategory -> expenseCategoryService.save(expenseCategory));
 
-            Expense expense1 = CreateExpense(2300.30, "Monthly rent", userService.findById((long) 1).get(),
-                    LocalDate.now(), category1);
+            Expense expense1 = CreateExpense(
+                    2300.30,
+                    "Monthly rent",
+                    userService.findById((long) 1).get(),
+                    LocalDate.now().minusDays(5), category1);
             Expense expense2 = CreateExpense(343.23, "Fine dining", userService.findById((long) 2).get(),
-                    LocalDate.now(), category2);
+                    LocalDate.now().minusDays(2), category2);
             Expense expense3 = CreateExpense(40.25, "Concert ticket", userService.findById((long) 3).get(),
-                    LocalDate.now(), category3);
+                    LocalDate.now().minusDays(3), category3);
 
             List<Expense> expenses = List.of(expense1, expense2, expense3);
             expenses.forEach(expense -> expenseService.save(expense));
 
+            CreateReport(user1, LocalDate.now().minusMonths(1), LocalDate.now());
+            CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
+            CreateReport(user3, LocalDate.now().minusMonths(1), LocalDate.now());
         };
 
     }
 
     private User CreateUser(String username, String password, String role, String firstName, String lastName,
-            String email, String phone) {
+                            String email, String phone) {
         return new User(username, password, role, firstName, lastName, email, phone);
     }
 
@@ -113,7 +116,7 @@ public class DataInitializer {
     }
 
     private Expense CreateExpense(double amount, String description, User user, LocalDate date,
-            ExpenseCategory category) {
+                                  ExpenseCategory category) {
         return new Expense(amount, description, user, date, category);
     }
 

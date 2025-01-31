@@ -82,8 +82,11 @@ public class ReportServiceImpl implements ReportService {
                 .mapToDouble(Expense::getAmount)
                 .sum();
 
+        double netAmount = totalIncome - totalExpense;
+
         report.setTotalIncome(totalIncome);
         report.setTotalExpense(totalExpense);
+        report.setNetAmount(netAmount);
 
         return reportRepository.save(report);
     }
@@ -116,7 +119,6 @@ public class ReportServiceImpl implements ReportService {
                 .sum();
         existingReport.setTotalExpense(totalExpense);
 
-
         return reportRepository.save(existingReport);
     }
 
@@ -130,14 +132,12 @@ public class ReportServiceImpl implements ReportService {
 
     }
 
+
     public List<Report> getReportsByUserId(Long userId) {
         return userService.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"))
                 .getReports();
     }
 
-    public List<Report> getReportsByDateRange(Long userId, String startDate, String endDate) {
 
-        return null;
-    }
 }
