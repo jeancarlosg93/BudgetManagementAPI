@@ -20,5 +20,11 @@ public interface BudgetService {
 
     List<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId);
 
+    List<Budget> findByUserIdAndMonthAndYearAndCategory(Long userId, int month, int year, String Category);
+
+    List<Budget> findByUseridAndCategory(Long userId, String Category);
+
     List<Budget> findByUserIdAndMonthAndYear(Long userId, int month, int year);
+
+    void calculateBudgetStatus(Budget budget);
 }

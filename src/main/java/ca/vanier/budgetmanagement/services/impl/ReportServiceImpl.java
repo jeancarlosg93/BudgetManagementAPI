@@ -170,25 +170,9 @@ public class ReportServiceImpl implements ReportService {
 
     private void recalculateReportBudgetTotals(Report report) {
         List<Budget> budgets = report.getBudgets();
+
         if (budgets != null) {
-            budgets.forEach(budget -> {
-                List<Expense> expenses = expenseService.findByUserIdAndCategoryIdAndMonthAndYear(
-                        budget.getUser().getId(),
-                        budget.getCategory().getId(),
-                        budget.getStartDate().getMonthValue(),
-                        budget.getStartDate().getYear()
-                );
-
-                double totalExpenses = expenses.stream()
-                        .filter(expense ->
-                                !expense.getDate().isBefore(budget.getStartDate()) &&
-                                        !expense.getDate().isAfter(budget.getEndDate())
-                        )
-                        .mapToDouble(Expense::getAmount)
-                        .sum();
-
-                budget.setActualExpenses(totalExpenses);
-            });
+            budgets.forEach(budget -> budgetService.calculateBudgetStatus(budget));
 
             double totalBudgeted = budgets.stream()
                     .mapToDouble(Budget::getAmount)

@@ -60,7 +60,9 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     public List<Budget> findAll() {
         GlobalLogger.info(BudgetServiceImpl.class, "Fetching all budgets");
-        return budgetRepository.findAll();
+        List<Budget> budgets = budgetRepository.findAll();
+        budgets.forEach(this::calculateBudgetStatus);
+        return budgets;
     }
 
     @Override
@@ -135,12 +137,33 @@ public class BudgetServiceImpl implements BudgetService {
     public List<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId) {
         GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets by user id {} and category id: {}", userId, categoryId);
 
-        return findByUserId(userId).stream()
+        List<Budget> budgets = findByUserId(userId).stream()
                 .filter(budget -> budget.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
+                .toList();
+        budgets.forEach(this::calculateBudgetStatus);
+        return budgets;
     }
 
-    private void calculateBudgetStatus(Budget budget) {
+    @Override
+    public List<Budget> findByUserIdAndMonthAndYearAndCategory(Long userId, int month, int year, String Category) {
+        List<Budget> budgets = findByUserIdAndMonthAndYear(userId, month, year).stream()
+                .filter(budget -> budget.getCategory().getName().equals(Category))
+                .toList();
+        budgets.forEach(this::calculateBudgetStatus);
+        return budgets;
+    }
+
+    @Override
+    public List<Budget> findByUseridAndCategory(Long userId, String Category) {
+        List<Budget> budgets = findByUserId
+                (userId).stream()
+                .filter(budget -> budget.getCategory().getName().equals(Category))
+                .toList();
+        budgets.forEach(this::calculateBudgetStatus);
+        return budgets;
+    }
+
+    public void calculateBudgetStatus(Budget budget) {
         List<Expense> expenses = expenseService.findByUserIdAndCategoryIdAndMonthAndYear(
                 budget.getUser().getId(),
                 budget.getCategory().getId(),
