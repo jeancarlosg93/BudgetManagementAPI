@@ -8,6 +8,7 @@ import ca.vanier.budgetmanagement.services.ExpenseService;
 import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.services.ReportService;
 import ca.vanier.budgetmanagement.services.UserService;
+import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.validators.ReportValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,12 +32,18 @@ public class ReportServiceImpl implements ReportService {
 
     @Transactional
     public Report createReport(Long userId, LocalDate startDate, LocalDate endDate) {
+        GlobalLogger.info(ReportService.class, "Creating report for user id: " + userId);
 
 
         Report report = new Report();
 
-        report.setUser(userService.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        try {
+            report.setUser(userService.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.error(ReportService.class, e.getMessage());
+            throw new RuntimeException(e);
+        }
 
         report.setStartDate(startDate);
         report.setEndDate(endDate);
@@ -88,11 +95,13 @@ public class ReportServiceImpl implements ReportService {
         report.setTotalExpense(totalExpense);
         report.setNetAmount(netAmount);
 
+        GlobalLogger.info(ReportService.class, "Report created: " + report);
         return reportRepository.save(report);
     }
 
 
     public Report getReportById(Long id) {
+        GlobalLogger.info(ReportService.class, "Getting report by id: " + id);
 
         return reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found"));
@@ -100,6 +109,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Transactional
     public Report updateReport(Report report) {
+        GlobalLogger.info(ReportService.class, "Updating report: " + report);
         ReportValidator.validateReport(report);
 
         Report existingReport = getReportById(report.getId());
@@ -118,22 +128,26 @@ public class ReportServiceImpl implements ReportService {
                 .mapToDouble(Expense::getAmount)
                 .sum();
         existingReport.setTotalExpense(totalExpense);
-
+        GlobalLogger.info(ReportService.class, "Report updated: " + existingReport);
         return reportRepository.save(existingReport);
     }
 
     @Transactional
     public void deleteReport(Long id) {
+        GlobalLogger.info(ReportService.class, "Deleting report by id: " + id);
+
         reportRepository.deleteById(getReportById(id).getId());
     }
 
     public List<Report> getAllReports() {
+        GlobalLogger.info(ReportService.class, "Getting all reports");
         return reportRepository.findAll();
 
     }
 
 
     public List<Report> getReportsByUserId(Long userId) {
+        GlobalLogger.info(ReportService.class, "Getting reports by user id: " + userId);
         return userService.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"))
                 .getReports();
