@@ -45,6 +45,12 @@ public class ApplicationSecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/income/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/income/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/income/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/reports/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/reports/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/reports/**").hasRole("USER")
+
+
                         .anyRequest().authenticated()).userDetailsService(userDetailsService)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());

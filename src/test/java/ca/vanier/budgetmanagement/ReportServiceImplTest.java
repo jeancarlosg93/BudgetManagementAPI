@@ -2,6 +2,7 @@ package ca.vanier.budgetmanagement;
 
 import ca.vanier.budgetmanagement.entities.*;
 import ca.vanier.budgetmanagement.repositories.ReportRepository;
+import ca.vanier.budgetmanagement.services.BudgetService;
 import ca.vanier.budgetmanagement.services.ExpenseService;
 import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.services.UserService;
@@ -36,6 +37,8 @@ class ReportServiceImplTest {
 
     @Mock
     private ExpenseService expenseService;
+    @Mock
+    private BudgetService budgetService;
 
     @InjectMocks
     private ReportServiceImpl reportService;
@@ -79,6 +82,8 @@ class ReportServiceImplTest {
         Expense expense2 = new Expense(500.00, "Utilities", testUser, LocalDate.of(2024, 2, 10), category);
         testExpenses.add(expense1);
         testExpenses.add(expense2);
+
+
 
         // Initialize test report
         testReport = new Report();

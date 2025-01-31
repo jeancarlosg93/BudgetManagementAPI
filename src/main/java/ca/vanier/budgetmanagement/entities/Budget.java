@@ -37,6 +37,23 @@ public class Budget {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Getter
+    @Transient
+    private double actualExpenses;
+
+    @Getter
+    @Transient
+    private double remainingAmount;
+
+    public void setActualExpenses(double actualExpenses) {
+        this.actualExpenses = actualExpenses;
+        this.remainingAmount = this.amount - actualExpenses;
+    }
+
+    public String getStatus() {
+        return remainingAmount >= 0 ? "Within Budget" : "Over Budget";
+    }
+
     public Budget(double amount, String name, String description, User user,
                   LocalDate startDate, LocalDate endDate, ExpenseCategory category) {
         this.amount = amount;

@@ -21,19 +21,26 @@ public class ReportController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getReportById(Long id) {
+    public ResponseEntity<?> getReportById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(reportService.getReportById(id));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createReport(Long userId, LocalDate startDate, LocalDate endDate) {
+    public ResponseEntity<?> createReport(@RequestParam Long userId,
+                                          @RequestParam LocalDate startDate,
+                                          @RequestParam LocalDate endDate) {
         return ResponseEntity.ok(reportService.createReport(userId, startDate, endDate));
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteReport(Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteReport(@PathVariable Long id) {
         reportService.deleteReport(id);
         return ResponseEntity.ok("Report deleted");
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getReportsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(reportService.getReportsByUserId(userId));
     }
 
 

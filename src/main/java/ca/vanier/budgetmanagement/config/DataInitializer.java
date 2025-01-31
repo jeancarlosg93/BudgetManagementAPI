@@ -1,11 +1,7 @@
 package ca.vanier.budgetmanagement.config;
 
 import ca.vanier.budgetmanagement.entities.*;
-import ca.vanier.budgetmanagement.services.IncomeService;
-import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
-import ca.vanier.budgetmanagement.services.ReportService;
-import ca.vanier.budgetmanagement.services.ExpenseService;
-import ca.vanier.budgetmanagement.services.UserService;
+import ca.vanier.budgetmanagement.services.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
@@ -23,14 +19,21 @@ public class DataInitializer {
     ExpenseCategoryService expenseCategoryService;
     ReportService reportService;
     ExpenseService expenseService;
+    BudgetService budgetService;
 
-    public DataInitializer(UserService userService, ExpenseCategoryService expenseCategoryService,
-                           IncomeService incomeService, ReportService reportService, ExpenseService expenseService) {
+    public DataInitializer(UserService userService,
+                           ExpenseCategoryService expenseCategoryService,
+                           IncomeService incomeService,
+                           ReportService reportService,
+                           ExpenseService expenseService,
+                           BudgetService budgetService) {
+
         this.userService = userService;
         this.expenseCategoryService = expenseCategoryService;
         this.incomeService = incomeService;
         this.reportService = reportService;
         this.expenseService = expenseService;
+        this.budgetService = budgetService;
     }
 
     @Bean
@@ -87,13 +90,55 @@ public class DataInitializer {
                     "Monthly rent",
                     userService.findById((long) 1).get(),
                     LocalDate.now().minusDays(5), category1);
-            Expense expense2 = CreateExpense(343.23, "Fine dining", userService.findById((long) 2).get(),
-                    LocalDate.now().minusDays(2), category2);
-            Expense expense3 = CreateExpense(40.25, "Concert ticket", userService.findById((long) 3).get(),
-                    LocalDate.now().minusDays(3), category3);
+            Expense expense2 = CreateExpense(
+                    343.23,
+                    "Fine dining",
+                    userService.findById((long) 2).get(),
+                    LocalDate.now().minusDays(2),
+                    category2);
+            Expense expense3 = CreateExpense(
+                    40.25,
+                    "Concert ticket",
+                    userService.findById((long) 3).get(),
+                    LocalDate.now().minusDays(3),
+                    category3);
 
             List<Expense> expenses = List.of(expense1, expense2, expense3);
             expenses.forEach(expense -> expenseService.save(expense));
+
+            Budget budget1 = CreateBudget(
+                    3000.00,
+                    "Monthly Housing Budget",
+                    "Budget for rent and utilities",
+                    user1,
+                    LocalDate.now().withDayOfMonth(1),
+                    LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
+                    category1
+            );
+
+            Budget budget2 = CreateBudget(
+                    500.00,
+                    "Food Budget",
+                    "Monthly food expenses",
+                    user2,
+                    LocalDate.now().withDayOfMonth(1),
+                    LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
+                    category2
+            );
+
+            Budget budget3 = CreateBudget(
+                    200.00,
+                    "Entertainment Budget",
+                    "Monthly entertainment expenses",
+                    user3,
+                    LocalDate.now().withDayOfMonth(1),
+                    LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
+                    category3
+            );
+
+            List<Budget> budgets = List.of(budget1, budget2, budget3);
+            budgets.forEach(budget -> budgetService.save(budget));
+
 
             CreateReport(user1, LocalDate.now().minusMonths(1), LocalDate.now());
             CreateReport(user2, LocalDate.now().minusMonths(1), LocalDate.now());
@@ -122,5 +167,9 @@ public class DataInitializer {
 
     private void CreateReport(User user, LocalDate startDate, LocalDate endDate) {
         reportService.createReport(user.getId(), startDate, endDate);
+    }
+
+    private Budget CreateBudget(double amount, String name, String description, User user, LocalDate startDate, LocalDate endDate, ExpenseCategory category) {
+        return new Budget(amount, name, description, user, startDate, endDate, category);
     }
 }

@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -48,8 +49,16 @@ public class Report {
     @Column(nullable = false)
     private LocalDate endDate;
 
+    @OneToMany
+    @JoinTable(name = "report_budgets")
+    @ToString.Exclude
+    private List<Budget> budgets = new ArrayList<>();
+
     private double totalIncome ;
     private double totalExpense;
     private double netAmount;
+    private double totalBudgeted;
+    private double totalBudgetSpent;
+    private double totalBudgetRemaining;
 
 }
