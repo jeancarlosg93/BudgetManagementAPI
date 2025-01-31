@@ -42,7 +42,7 @@ public class ReportServiceImpl implements ReportService {
                     .orElseThrow(() -> new IllegalArgumentException("User not found")));
         } catch (IllegalArgumentException e) {
             GlobalLogger.error(ReportService.class, e.getMessage());
-            throw new RuntimeException(e);
+            throw e;
         }
 
         report.setStartDate(startDate);

@@ -59,6 +59,11 @@ public class User {
     @ToString.Exclude
     private List<Expense> expenseCategories = new ArrayList<>();
 
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    @ToString.Exclude
+    private List<Budget> budgets = new ArrayList<>();
+
     public User(String username, String password, String role, String firstName, String lastName, String email,
             String phone) {
         this.username = username;
