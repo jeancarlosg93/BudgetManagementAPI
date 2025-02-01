@@ -11,11 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Month;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class IncomeServiceImpl implements IncomeService {
@@ -118,6 +117,24 @@ public class IncomeServiceImpl implements IncomeService {
         }
     }
 
+
+    @Override
+    public List<Income> findWithFilters(long userId, String incomeType,
+                                        LocalDate startDate, LocalDate endDate) {
+        boolean hasIncomeType = incomeType != null;
+        boolean hasDateRange = startDate != null && endDate != null;
+
+        if (hasIncomeType && hasDateRange) {
+            return find(userId, startDate, endDate, incomeType);
+        } else if (hasDateRange) {
+            return find(userId, startDate, endDate);
+        } else if (hasIncomeType) {
+            return find(userId, incomeType);
+        } else {
+            return find(userId);
+        }
+    }
+
     @Override
     public Optional<Income> findById(Long id) {
         GlobalLogger.info(IncomeServiceImpl.class, "Finding income by id: {}", id);
@@ -136,7 +153,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public List<Income> findByUserId(Long userId) {
+    public List<Income> find(long userId) {
         GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}", userId);
 
         try {
@@ -146,99 +163,59 @@ public class IncomeServiceImpl implements IncomeService {
             return incomes;
         } catch (IllegalArgumentException e) {
             GlobalLogger.warn(IncomeServiceImpl.class, "Failed to find incomes: {}", e.getMessage());
+            throw new IllegalArgumentException("Failed to find incomes: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Income> find(long userid, LocalDate startDate, LocalDate endDate) {
+        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, start date: {} and end date: {}", userid, startDate, endDate);
+
+        try {
+            List<Income> incomes = find(userid).stream()
+                    .filter(income -> income.getDate().isAfter(startDate) && income.getDate().isBefore(endDate))
+                    .toList();
+            GlobalLogger.info(IncomeServiceImpl.class, "Found {} incomes for user id: {}", incomes.size(), userid);
+            return incomes;
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(IncomeServiceImpl.class, "Failed to find incomes: {}", e.getMessage());
             throw e;
         }
     }
 
-    public List<Income> findByUserIdAndMonth(Long userId, int month) {
-
-        IncomeValidator.validateMonth(month);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {} and month: {}", userId, month);
-
-        return findByUserId(userId)
-                .stream().filter(income -> income.getDate() != null &&
-                        income.getDate().getMonth().equals(Month.of(month)))
-                .collect(Collectors.toList());
-    }
-
-    public List<Income> findByUserIdAndYear(Long userId, int year) {
-        IncomeValidator.validateYear(year);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {} and year: {}", userId, year);
-        return findByUserId(userId).stream().filter(income -> income.getDate().getYear() == year)
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Income> findByUserIdAndMonthAndYear(Long userId, int month, int year) {
-
-        IncomeValidator.validateMonth(month);
-        IncomeValidator.validateYear(year);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, month: {} and year: {}", userId, month, year);
-        return findByUserIdAndYear(userId, year).stream().filter(income -> income.getDate().getMonth().equals(Month.of(month)))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Income> findByUserIdAndMonthAndYearAndIncomeType(Long userId, int month, int year, String incomeType) {
-
-        IncomeValidator.validateMonth(month);
-        IncomeValidator.validateYear(year);
+    @Override
+    public List<Income> find(long userid, LocalDate startDate, LocalDate endDate, String incomeType) {
         IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, month: {}, year: {} and income type: {}", userId, month, year, incomeType);
-        return findByUserIdAndMonthAndYear(userId, month, year)
-                .stream().filter(income -> income.getType().name().equals(incomeType))
-                .collect(Collectors.toList());
+        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, start date: {}, end date: {} and income type: {}", userid, startDate, endDate, incomeType);
 
+        try {
+            List<Income> incomes = find(userid, startDate, endDate).stream()
+                    .filter(income -> income.getType().name().equals(incomeType))
+                    .toList();
+            GlobalLogger.info(IncomeServiceImpl.class, "Found {} incomes for user id: {}", incomes.size(), userid);
+            return incomes;
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(IncomeServiceImpl.class, "Failed to find incomes: {}", e.getMessage());
+            throw e;
+        }
     }
 
-    public List<Income> findByUserIdAndIncomeType(Long userId, String incomeType) {
-
+    @Override
+    public List<Income> find(long userid, String incomeType) {
         IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {} and income type: {}", userId, incomeType);
-        return findByUserId(userId)
-                .stream().filter(income -> income.getType().name().equals(incomeType))
-                .collect(Collectors.toList());
-    }
+        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {} and income type: {}", userid, incomeType);
 
-    public List<Income> findByUserIdAndYearAndIncomeType(Long userId, int year, String incomeType) {
-        IncomeValidator.validateYear(year);
-        IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, year: {} and income type: {}", userId, year, incomeType);
-        return findByUserIdAndYear(userId, year)
-                .stream().filter(income -> income.getType().name().equals(incomeType))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Income> findByUserIdAndIncomeTypeAndMonth(Long userId, String incomeType, int month) {
-
-        IncomeValidator.validateMonth(month);
-        IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, month: {} and income type: {}", userId, month, incomeType);
-        return findByUserIdAndMonth(userId, month)
-                .stream().filter(income -> income.getType().name().equals(incomeType))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Income> findByUserIdAndIncomeTypeAndYear(Long userId, String incomeType, int year) {
-        IncomeValidator.validateIncomeType(incomeType);
-        IncomeValidator.validateYear(year);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, year: {} and income type: {}", userId, year, incomeType);
-        return findByUserIdAndYear(userId, year)
-                .stream().filter(income -> income.getType().name().equals(incomeType))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Income> findByUserIdAndIncomeTypeAndMonthAndYear(Long userId, String incomeType, int month, int year) {
-
-        IncomeValidator.validateMonth(month);
-        IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, month: {}, year: {} and income type: {}", userId, month, year, incomeType);
-        return findByUserIdAndMonthAndYear(userId, month, year)
-                .stream().filter(income -> income.getType().name().equals(incomeType))
-                .collect(Collectors.toList());
+        try {
+            List<Income> incomes =
+                    find(userid).stream()
+                            .filter(income -> income.getType().name().equals(incomeType))
+                            .toList();
+            GlobalLogger.info(IncomeServiceImpl.class, "Found {} incomes for user id: {}", incomes.size(), userid);
+            return incomes;
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(IncomeServiceImpl.class, "Failed to find incomes: {}", e.getMessage());
+            throw e;
+        }
     }
 
     private User getUser(long userId) {

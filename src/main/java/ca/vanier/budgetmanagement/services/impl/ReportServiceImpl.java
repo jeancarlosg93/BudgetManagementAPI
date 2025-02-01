@@ -48,7 +48,12 @@ public class ReportServiceImpl implements ReportService {
         report.setStartDate(startDate);
         report.setEndDate(endDate);
 
-        List<Income> allIncomes = new ArrayList<>();
+        List<Income> allIncomes = incomeService.find(
+                userId,
+                startDate,
+                endDate
+        );
+
         List<Expense> allExpenses = new ArrayList<>();
         List<Budget> allBudgets = new ArrayList<>();
 
@@ -58,13 +63,6 @@ public class ReportServiceImpl implements ReportService {
         while (!currentDate.isAfter(endDate)) {
             int month = currentDate.getMonthValue();
             int year = currentDate.getYear();
-
-            List<Income> monthlyIncomes = incomeService.findByUserIdAndMonthAndYear(
-                    userId,
-                    month,
-                    year
-            );
-            allIncomes.addAll(monthlyIncomes);
 
             List<Expense> monthlyExpenses = expenseService.findByUserIdAndMonthAndYear(
                     userId,

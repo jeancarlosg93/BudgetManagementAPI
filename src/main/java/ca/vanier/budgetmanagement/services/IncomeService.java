@@ -2,6 +2,7 @@ package ca.vanier.budgetmanagement.services;
 
 import ca.vanier.budgetmanagement.entities.Income;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,25 +18,16 @@ public interface IncomeService {
 
     Optional<Income> findById(Long id);
 
-    List<Income> findByUserId(Long userId);
+    List<Income> find(long userid);
 
-    List<Income> findByUserIdAndMonth(Long userId, int month);
+    List<Income> find(long userid, LocalDate startDate, LocalDate endDate);
 
-    List<Income> findByUserIdAndYear(Long userId, int year);
+    List<Income> find(long userid, LocalDate startDate, LocalDate endDate, String incomeType);
 
-    List<Income> findByUserIdAndMonthAndYear(Long userId, int month, int year);
+    List<Income> find(long userid, String incomeType);
 
-    List<Income> findByUserIdAndMonthAndYearAndIncomeType(Long userId, int month, int year, String IncomeType);
+    List<Income> findWithFilters(long userId, String incomeType, LocalDate startDate, LocalDate endDate);
 
-    List<Income> findByUserIdAndIncomeType(Long userId, String IncomeType);
-
-    List<Income> findByUserIdAndYearAndIncomeType(Long userId, int year, String IncomeType);
-
-    List<Income> findByUserIdAndIncomeTypeAndMonth(Long userId, String IncomeType, int month);
-
-    List<Income> findByUserIdAndIncomeTypeAndYear(Long userId, String IncomeType, int year);
-
-    List<Income> findByUserIdAndIncomeTypeAndMonthAndYear(Long userId, String IncomeType, int month, int year);
 
 
 }

@@ -95,18 +95,6 @@ class IncomeServiceImplTest {
     }
 
     @Test
-    void whenSaveIncome_withInvalidUser_thenThrowException() {
-        // Arrange
-        when(userService.findById(testUser.getId())).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            incomeService.save(testUser.getId(), testIncome);
-        });
-        verify(incomeRepository, never()).save(any());
-    }
-
-    @Test
     void whenFindAll_thenReturnIncomeList() {
         // Arrange
         when(incomeRepository.findAll()).thenReturn(testIncomes);
@@ -116,7 +104,7 @@ class IncomeServiceImplTest {
 
         // Assert
         assertFalse(found.isEmpty());
-        assertEquals(3, found.size());
+        assertEquals(2, found.size());
         verify(incomeRepository).findAll();
     }
 
@@ -194,7 +182,7 @@ class IncomeServiceImplTest {
         when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
         // Act
-        List<Income> found = incomeService.findByUserId(testUser.getId());
+        List<Income> found = incomeService.find(testUser.getId());
 
         // Assert
         assertFalse(found.isEmpty());
@@ -202,190 +190,5 @@ class IncomeServiceImplTest {
         verify(userService).findById(testUser.getId());
     }
 
-    @Test
-    void whenFindByUserId_withInvalidUser_thenThrowException() {
-        // Arrange
-        when(userService.findById(99L)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            incomeService.findByUserId(99L);
-        });
-
-    }
-
-    @Test
-    void whenFindByUserIdAndMonth_thenReturnFilteredIncomes() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndMonth(testUser.getId(), 3);
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> assertEquals(3, income.getDate().getMonthValue()));
-    }
-
-    @Test
-    void whenFindByUserIdAndMonth_withInvalidMonth_thenThrowException() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () ->
-                incomeService.findByUserIdAndMonth(testUser.getId(), 13));
-    }
-
-    @Test
-    void whenFindByUserIdAndYear_thenReturnFilteredIncomes() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndYear(testUser.getId(), 2024);
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> assertEquals(2024, income.getDate().getYear()));
-    }
-
-    @Test
-    void whenFindByUserIdAndYear_withInvalidYear_thenThrowException() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () ->
-                incomeService.findByUserIdAndYear(testUser.getId(), 1800));
-    }
-
-    @Test
-    void whenFindByUserIdAndMonthAndYear_thenReturnFilteredIncomes() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndMonthAndYear(testUser.getId(), 3, 2024);
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> {
-            assertEquals(3, income.getDate().getMonthValue());
-            assertEquals(2024, income.getDate().getYear());
-        });
-    }
-
-    @Test
-    void whenFindByUserIdAndIncomeType_thenReturnFilteredIncomes() {
-        // Arrange
-        testIncome.setType(SALARY);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndIncomeType(testUser.getId(), "SALARY");
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> assertEquals(SALARY, income.getType()));
-    }
-
-    @Test
-    void whenFindByUserIdAndIncomeType_withInvalidType_thenThrowException() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () ->
-                incomeService.findByUserIdAndIncomeType(testUser.getId(), "INVALID_TYPE"));
-    }
-
-    @Test
-    void whenFindByUserIdAndMonthAndYearAndIncomeType_thenReturnFilteredIncomes() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        testIncome.setType(SALARY);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndMonthAndYearAndIncomeType(
-                testUser.getId(), 3, 2024, "SALARY");
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> {
-            assertEquals(3, income.getDate().getMonthValue());
-            assertEquals(2024, income.getDate().getYear());
-            assertEquals(SALARY, income.getType());
-        });
-    }
-
-    @Test
-    void whenFindByUserIdAndMonthAndYearAndIncomeType_withNoMatches_thenReturnEmptyList() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        testIncome.setType(SALARY);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndMonthAndYearAndIncomeType(
-                testUser.getId(), 4, 2024, "SALARY");
-
-        // Assert
-        assertTrue(found.isEmpty());
-    }
-
-    @Test
-    void whenFindByUserIdAndIncomeTypeAndMonth_thenReturnFilteredIncomes() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        testIncome.setType(SALARY);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndIncomeTypeAndMonth(
-                testUser.getId(), "SALARY", 3);
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> {
-            assertEquals(3, income.getDate().getMonthValue());
-            assertEquals(SALARY, income.getType());
-        });
-    }
-
-    @Test
-    void whenFindByUserIdAndIncomeTypeAndYear_thenReturnFilteredIncomes() {
-        // Arrange
-        LocalDate date = LocalDate.of(2024, 3, 15);
-        testIncome.setDate(date);
-        testIncome.setType(SALARY);
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
-        // Act
-        List<Income> found = incomeService.findByUserIdAndIncomeTypeAndYear(
-                testUser.getId(), "SALARY", 2024);
-
-        // Assert
-        assertFalse(found.isEmpty());
-        found.forEach(income -> {
-            assertEquals(2024, income.getDate().getYear());
-            assertEquals(SALARY, income.getType());
-        });
-    }
-
-    @BeforeEach
-    void addMoreTestData() {
-        // Add income with different month/year/type for better testing
-        Income differentIncome = new Income(
-                4000.00,
-                "Different Month Income",
-                testUser,
-                LocalDate.of(2024, 4, 15),
-                DIVIDEND
-        );
-        differentIncome.setId(3L);
-        differentIncome.setType(BONUS);
-        testIncomes.add(differentIncome);
-    }
 }

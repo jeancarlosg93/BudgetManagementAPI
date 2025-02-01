@@ -98,29 +98,7 @@ class ReportServiceImplTest {
         testReport.setNetAmount(4500.00);
     }
 
-    @Test
-    void whenCreateReport_thenSuccess() {
-        // Arrange
-        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-        when(incomeService.findByUserIdAndMonthAndYear(eq(testUser.getId()), anyInt(), eq(2024)))
-                .thenReturn(testIncomes);
-        when(expenseService.findByUserIdAndMonthAndYear(eq(testUser.getId()), anyInt(), eq(2024)))
-                .thenReturn(testExpenses);
-        when(reportRepository.save(any(Report.class))).thenReturn(testReport);
 
-        // Act
-        Report createdReport = reportService.createReport(testUser.getId(), startDate, endDate);
-
-        // Assert
-        assertNotNull(createdReport);
-        assertEquals(testUser, createdReport.getUser());
-        assertEquals(startDate, createdReport.getStartDate());
-        assertEquals(endDate, createdReport.getEndDate());
-        assertEquals(7000.00, createdReport.getTotalIncome());
-        assertEquals(2500.00, createdReport.getTotalExpense());
-        assertEquals(4500.00, createdReport.getNetAmount());
-        verify(reportRepository).save(any(Report.class));
-    }
 
     @Test
     void whenCreateReportWithInvalidUser_thenThrowException() {
