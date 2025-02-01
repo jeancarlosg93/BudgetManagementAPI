@@ -70,9 +70,9 @@ public class DataInitializer {
                     CreateIncome(2500.00, "Stock dividends", user3, LocalDate.now().minusDays(30), DIVIDEND)
             );
 
-            user1Incomes.forEach(income -> incomeService.save(income));
-            user2Incomes.forEach(income -> incomeService.save(income));
-            user3Incomes.forEach(income -> incomeService.save(income));
+            user1Incomes.forEach(income -> incomeService.save(user1.getId(), income));
+            user2Incomes.forEach(income -> incomeService.save(user2.getId(), income));
+            user3Incomes.forEach(income -> incomeService.save(user1.getId(), income));
 
 
             ExpenseCategory category1 = CreateExpenseCategory("Rent", user1);

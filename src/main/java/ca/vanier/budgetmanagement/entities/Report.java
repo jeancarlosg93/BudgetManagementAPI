@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,11 +55,15 @@ public class Report {
     @ToString.Exclude
     private List<Budget> budgets = new ArrayList<>();
 
-    private double totalIncome ;
+    private double totalIncome;
     private double totalExpense;
     private double netAmount;
+
+    @Transient
     private double totalBudgeted;
+    @Transient
     private double totalBudgetSpent;
+    @Transient
     private double totalBudgetRemaining;
 
 }
