@@ -21,10 +21,10 @@ public class IncomeController {
         return new ResponseEntity<>(incomeService.findAll(), HttpStatus.OK);
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<?> saveIncome(@RequestBody Income income) {
+    @PostMapping("/save/user/{userId}")
+    public ResponseEntity<?> saveIncome(@PathVariable("userId") long userId, @RequestBody Income income) {
         try {
-            Income savedIncome = incomeService.save(income);
+            Income savedIncome = incomeService.save(userId,income);
             return new ResponseEntity<>(savedIncome, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -84,7 +84,7 @@ class IncomeServiceImplTest {
         when(incomeRepository.save(any(Income.class))).thenReturn(testIncome);
 
         // Act
-        Income savedIncome = incomeService.save(testIncome);
+        Income savedIncome = incomeService.save(testUser.getId(), testIncome);
 
         // Assert
         assertNotNull(savedIncome);
@@ -101,7 +101,7 @@ class IncomeServiceImplTest {
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
-            incomeService.save(testIncome);
+            incomeService.save(testUser.getId(), testIncome);
         });
         verify(incomeRepository, never()).save(any());
     }

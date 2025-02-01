@@ -35,23 +35,24 @@ public class BudgetServiceImpl implements BudgetService {
     private ExpenseService expenseService;
 
 
+    // Save a budget
     @Transactional
     @Override
     public Budget save(Budget budget) {
         GlobalLogger.info(BudgetServiceImpl.class, "Saving budget: {}", budget);
-
+        // If the budget has a user, find the user by id and set it
         if (budget.getUser() != null) {
             User user = userService.findById(budget.getUser().getId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             budget.setUser(user);
         }
-
+        // If the budget has a category, find the category by id and set it
         if (budget.getCategory() != null) {
             ExpenseCategory category = categoryService.findById(budget.getCategory().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Category not found"));
             budget.setCategory(category);
         }
-
+        // Save the budget
         Budget savedBudget = budgetRepository.save(budget);
         GlobalLogger.info(BudgetServiceImpl.class, "Budget saved successfully with id: {}", savedBudget.getId());
         return savedBudget;
@@ -163,6 +164,10 @@ public class BudgetServiceImpl implements BudgetService {
         return budgets;
     }
 
+    // Calculate the budget status
+    // This method calculates the actual expenses for a budget
+    // by summing the expenses for the budget's user, category, and month
+    // and setting the budget's actual expenses and remaining amount
     public void calculateBudgetStatus(Budget budget) {
         List<Expense> expenses = expenseService.findByUserIdAndCategoryIdAndMonthAndYear(
                 budget.getUser().getId(),

@@ -28,14 +28,14 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Transactional
     @Override
-    public Income save(Income income) {
+    public Income save(long userId, Income income) {
         GlobalLogger.info(IncomeServiceImpl.class, "Saving income: {}", income.toString());
 
         IncomeValidator.validateIncome(income);
 
         if (income.getUser() != null) {
             try {
-                User user = userService.findById(income.getUser().getId())
+                User user = userService.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 user.getIncomes().add(income);
                 income.setUser(user);
