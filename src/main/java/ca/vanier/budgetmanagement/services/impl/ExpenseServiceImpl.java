@@ -3,7 +3,9 @@ package ca.vanier.budgetmanagement.services.impl;
 import ca.vanier.budgetmanagement.entities.Expense;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
+import ca.vanier.budgetmanagement.entities.Report;
 import ca.vanier.budgetmanagement.repositories.ExpenseRepository;
+import ca.vanier.budgetmanagement.repositories.ReportRepository;
 import ca.vanier.budgetmanagement.services.ExpenseService;
 import ca.vanier.budgetmanagement.services.UserService;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
@@ -24,6 +26,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Autowired
     private ExpenseRepository expenseRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
 
     @Autowired
     private UserService userService;
@@ -60,11 +65,11 @@ public class ExpenseServiceImpl implements ExpenseService {
                 GlobalLogger.info(ExpenseServiceImpl.class, "Associated expense with expenseCategory id: {}",
                         category.getId());
             } catch (IllegalArgumentException e) {
-                GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenseCategory for expense: {}", e.getMessage());
+                GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenseCategory for expense: {}",
+                        e.getMessage());
                 throw e;
             }
         }
-
 
         Expense savedExpense = expenseRepository.save(expense);
         GlobalLogger.info(ExpenseServiceImpl.class, "Expense saved successfully with id: {}", savedExpense.getId());
@@ -85,6 +90,15 @@ public class ExpenseServiceImpl implements ExpenseService {
         try {
             Expense expense = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Expense not found"));
+
+            // Clear expense from any reports before deleteing
+            List<Report> reports = reportRepository.findAllByUser(expense.getUser());
+            for (Report report : reports) {
+                if (report.getExpenses().contains(expense)) {
+                    report.getExpenses().remove(expense);
+                    reportRepository.save(report); // Save updated report
+                }
+            }
 
             if (expense.getUser() != null) {
                 expense.getUser().getExpenses().remove(expense);
@@ -176,7 +190,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> find(Long userid, LocalDate startDate, LocalDate endDate, Long category) {
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} between dates: {} and {} and category: {}", userid,
+        GlobalLogger.info(ExpenseServiceImpl.class,
+                "Finding expenses by user id: {} between dates: {} and {} and category: {}", userid,
                 startDate, endDate, category);
         try {
             return find(userid, startDate, endDate).stream()
@@ -190,7 +205,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> find(Long userid, Long category) {
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} and category: {}", userid, category);
+        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} and category: {}", userid,
+                category);
         try {
             return find(userid).stream()
                     .filter(expense -> expense.getCategory().getId().equals(category))
@@ -204,7 +220,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
-
 
         boolean hasCategoryId = categoryId != null;
         boolean hasDateRange = startDate != null && endDate != null;

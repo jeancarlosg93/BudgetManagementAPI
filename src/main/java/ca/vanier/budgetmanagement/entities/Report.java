@@ -35,7 +35,7 @@ public class Report {
     @ToString.Exclude
     private List<Income> incomes;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "report_expenses")
     @ToString.Exclude
     private List<Expense> expenses;
