@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,7 +32,8 @@ public class Budget {
     private LocalDate endDate;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private ExpenseCategory category;
 
     @JsonBackReference
@@ -55,7 +59,7 @@ public class Budget {
     }
 
     public Budget(double amount, String name, String description, User user,
-                  LocalDate startDate, LocalDate endDate, ExpenseCategory category) {
+            LocalDate startDate, LocalDate endDate, ExpenseCategory category) {
         this.amount = amount;
         this.name = name;
         this.description = description;
