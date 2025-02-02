@@ -20,10 +20,11 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
     public ExpenseCategory save(ExpenseCategory expenseCategory) {
         GlobalLogger.info(ExpenseCategoryServiceImpl.class, "Saving ExpenseCategory: {}", expenseCategory);
 
-        if (expenseCategoryRepository.findByName(expenseCategory.getName()) != null) {
-            GlobalLogger.warn(ExpenseCategoryServiceImpl.class, "ExpenseCategory already exists with name: {}",
-                    expenseCategory.getName());
-            throw new IllegalArgumentException("Cannot save expenseCategory with existing name");
+        if (expenseCategoryRepository.findByNameAndUser(expenseCategory.getName(), expenseCategory.getUser()) != null) {
+            GlobalLogger.warn(ExpenseCategoryServiceImpl.class,
+                    "ExpenseCategory already exists with name: {}, and userId: {}",
+                    expenseCategory.getName(), expenseCategory.getUser().getId());
+            throw new IllegalArgumentException("Cannot save expenseCategory with existing name and user");
         }
 
         if (expenseCategory.getId() == null) {

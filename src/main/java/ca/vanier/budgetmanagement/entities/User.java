@@ -57,10 +57,9 @@ public class User {
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
-    private List<Expense> expenseCategories = new ArrayList<>();
+    private List<ExpenseCategory> expenseCategories = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
     private List<Budget> budgets = new ArrayList<>();
 
