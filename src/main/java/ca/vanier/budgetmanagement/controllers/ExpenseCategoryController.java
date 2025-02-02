@@ -24,7 +24,7 @@ public class ExpenseCategoryController {
         }
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateExpenseCategory(@PathVariable Long id,
             @RequestBody ExpenseCategory categoryDetails) {
         try {
