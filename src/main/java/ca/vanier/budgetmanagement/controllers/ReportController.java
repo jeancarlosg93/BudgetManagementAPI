@@ -1,6 +1,5 @@
 package ca.vanier.budgetmanagement.controllers;
 
-
 import ca.vanier.budgetmanagement.services.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/api/report")
 public class ReportController {
 
     @Autowired
@@ -27,8 +26,8 @@ public class ReportController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createReport(@RequestParam Long userId,
-                                          @RequestParam LocalDate startDate,
-                                          @RequestParam LocalDate endDate) {
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) {
         return ResponseEntity.ok(reportService.createReport(userId, startDate, endDate));
     }
 
@@ -42,6 +41,5 @@ public class ReportController {
     public ResponseEntity<?> getReportsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(reportService.getReportsByUserId(userId));
     }
-
 
 }
