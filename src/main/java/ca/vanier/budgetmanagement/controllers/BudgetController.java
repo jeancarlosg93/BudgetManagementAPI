@@ -57,7 +57,7 @@ public class BudgetController {
         }
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(budgetService.findById(id), HttpStatus.OK);
@@ -66,7 +66,7 @@ public class BudgetController {
         }
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budgetDetails) {
         try {
             return new ResponseEntity<>(budgetService.updateExistingBudget(id, budgetDetails), HttpStatus.OK);
