@@ -28,14 +28,12 @@ public class Report {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany
-    @JoinTable(name = "report_incomes")
-    @ToString.Exclude
+    @ManyToMany
+    @JoinTable(name = "report_incomes", joinColumns = @JoinColumn(name = "report_id"), inverseJoinColumns = @JoinColumn(name = "income_id"))
     private List<Income> incomes;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinTable(name = "report_expenses")
-    @ToString.Exclude
+    @ManyToMany
+    @JoinTable(name = "report_expenses", joinColumns = @JoinColumn(name = "report_id"), inverseJoinColumns = @JoinColumn(name = "expense_id"))
     private List<Expense> expenses;
 
     @CreationTimestamp
