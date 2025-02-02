@@ -35,7 +35,7 @@ public class ExpenseCategoryController {
         }
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
