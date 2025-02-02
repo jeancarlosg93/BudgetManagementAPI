@@ -47,8 +47,7 @@ class IncomeServiceImplTest {
                 "Test",
                 "User",
                 "test@example.com",
-                "123-456-7890"
-        );
+                "123-456-7890");
         testUser.setId(1L);
 
         testIncome = new Income(
@@ -56,8 +55,7 @@ class IncomeServiceImplTest {
                 "Monthly Salary",
                 testUser,
                 LocalDate.now(),
-                SALARY
-        );
+                SALARY);
         testIncome.setId(1L);
 
         Income secondIncome = new Income(
@@ -65,10 +63,8 @@ class IncomeServiceImplTest {
                 "Part-time work",
                 testUser,
                 LocalDate.now(),
-                BONUS
-        );
+                BONUS);
         secondIncome.setId(2L);
-
 
         testIncomes = new ArrayList<>();
         testIncomes.add(testIncome);
@@ -84,7 +80,7 @@ class IncomeServiceImplTest {
         when(incomeRepository.save(any(Income.class))).thenReturn(testIncome);
 
         // Act
-        Income savedIncome = incomeService.save(testUser.getId(), testIncome);
+        Income savedIncome = incomeService.save(testIncome);
 
         // Assert
         assertNotNull(savedIncome);
@@ -130,8 +126,7 @@ class IncomeServiceImplTest {
                 "Updated Salary",
                 testUser,
                 LocalDate.now(),
-                DIVIDEND
-        );
+                DIVIDEND);
         updatedIncome.setId(testIncome.getId());
         updatedIncome.setType(SALARY);
 
@@ -186,9 +181,8 @@ class IncomeServiceImplTest {
 
         // Assert
         assertFalse(found.isEmpty());
-        assertEquals(2, found.size());  // Since we added 2 incomes in setUp
+        assertEquals(2, found.size()); // Since we added 2 incomes in setUp
         verify(userService).findById(testUser.getId());
     }
-
 
 }
