@@ -3,10 +3,12 @@ package ca.vanier.budgetmanagement.controllers;
 import ca.vanier.budgetmanagement.entities.Expense;
 import ca.vanier.budgetmanagement.services.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -15,6 +17,27 @@ public class ExpenseController {
 
     @Autowired
     ExpenseService expenseService;
+
+    // request can be made to /api/expense/user/{userId}`
+    // with optional query parameters categoryId, startDate, and endDate
+    // startDate and endDate must be in the format yyyy-MM-dd
+    // if no query parameters are provided, all incomes for the user will be returned
+    // if any query parameters are invalid, a bad request response will be returned
+    // if the user does not exist, a not found response will be returned
+    // if the user has no incomes, an empty list will be returned
+    // example request: /api/expense/user/1?categoryId=1&startDate=2021-01-01&endDate=2021-12-31
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getExpensesByUserId(@PathVariable Long userId,
+                                                 @RequestParam(required = false) Long categoryId,
+                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            List<Expense> expenses = expenseService.findWithFilters(userId, categoryId, startDate, endDate);
+            return ResponseEntity.ok(expenses);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Expense>> getAllExpenses() {
@@ -55,16 +78,6 @@ public class ExpenseController {
     public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(expenseService.findById(id), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getExpensesByUserId(@PathVariable Long userId) {
-        try {
-            List<Expense> expenses = expenseService.findByUserId(userId);
-            return new ResponseEntity<>(expenses, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }

@@ -1,8 +1,8 @@
 package ca.vanier.budgetmanagement.services;
 
 import ca.vanier.budgetmanagement.entities.Expense;
-import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,24 +18,14 @@ public interface ExpenseService {
 
     Optional<Expense> findById(Long id);
 
-    List<Expense> findByUserId(Long userId);
+    List<Expense> find(Long userid);
 
-    List<Expense> findByUserIdAndMonth(Long userId, int month);
+    List<Expense> find(Long userid, LocalDate startDate, LocalDate endDate);
 
-    List<Expense> findByUserIdAndYear(Long userId, int year);
+    List<Expense> find(Long userid, LocalDate startDate, LocalDate endDate, Long category);
 
-    List<Expense> findByUserIdAndMonthAndYear(Long userId, int month, int year);
+    List<Expense> find(Long userid, Long category);
 
-    List<Expense> findByUserIdAndMonthAndYearAndCategoryId(Long userId, int month, int year, Long categoryId);
-
-    List<Expense> findByUserIdAndCategoryId(Long userId, Long categoryId);
-
-    List<Expense> findByUserIdAndYearAndCategoryId(Long userId, int year, Long categoryId);
-
-    List<Expense> findByUserIdAndCategoryIdAndMonth(Long userId, Long categoryId, int month);
-
-    List<Expense> findByUserIdAndCategoryIdAndYear(Long userId, Long categoryId, int year);
-
-    List<Expense> findByUserIdAndCategoryIdAndMonthAndYear(Long userId, Long categoryId, int month, int year);
+    List<Expense> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate);
 
 }

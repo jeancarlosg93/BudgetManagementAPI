@@ -169,11 +169,11 @@ public class BudgetServiceImpl implements BudgetService {
     // by summing the expenses for the budget's user, category, and month
     // and setting the budget's actual expenses and remaining amount
     public void calculateBudgetStatus(Budget budget) {
-        List<Expense> expenses = expenseService.findByUserIdAndCategoryIdAndMonthAndYear(
+        List<Expense> expenses = expenseService.findWithFilters(
                 budget.getUser().getId(),
                 budget.getCategory().getId(),
-                budget.getStartDate().getMonthValue(),
-                budget.getStartDate().getYear()
+                budget.getStartDate(),
+                budget.getEndDate()
         );
 
         double totalExpenses = expenses.stream()

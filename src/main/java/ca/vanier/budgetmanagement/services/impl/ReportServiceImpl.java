@@ -54,7 +54,12 @@ public class ReportServiceImpl implements ReportService {
                 endDate
         );
 
-        List<Expense> allExpenses = new ArrayList<>();
+        List<Expense> allExpenses = expenseService.find(
+                userId,
+                startDate,
+                endDate
+        );
+
         List<Budget> allBudgets = new ArrayList<>();
 
 
@@ -64,12 +69,6 @@ public class ReportServiceImpl implements ReportService {
             int month = currentDate.getMonthValue();
             int year = currentDate.getYear();
 
-            List<Expense> monthlyExpenses = expenseService.findByUserIdAndMonthAndYear(
-                    userId,
-                    month,
-                    year
-            );
-            allExpenses.addAll(monthlyExpenses);
 
             List<Budget> budgets = budgetService.findByUserIdAndMonthAndYear(
                     userId,
