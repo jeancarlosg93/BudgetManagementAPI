@@ -21,19 +21,18 @@ public class ExpenseController {
     // request can be made to /api/expense/user/{userId}`
     // with optional query parameters categoryId, startDate, and endDate
     // startDate and endDate must be in the format yyyy-MM-dd
-    // if no query parameters are provided, all incomes for the user will be returned
+    // if no query parameters are provided, all expense for the user will be returned
     // if any query parameters are invalid, a bad request response will be returned
     // if the user does not exist, a not found response will be returned
     // if the user has no incomes, an empty list will be returned
     // example request: /api/expense/user/1?categoryId=1&startDate=2021-01-01&endDate=2021-12-31
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getExpensesByUserId(@PathVariable Long userId,
-                                                 @RequestParam(required = false) Long categoryId,
-                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<?> getExpenses(@PathVariable Long userId,
+                                         @RequestParam(required = false) Long categoryId,
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
-            List<Expense> expenses = expenseService.findWithFilters(userId, categoryId, startDate, endDate);
-            return ResponseEntity.ok(expenses);
+            return new ResponseEntity<>(expenseService.findWithFilters(userId, categoryId, startDate, endDate), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }

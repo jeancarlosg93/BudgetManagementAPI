@@ -60,26 +60,11 @@ public class ReportServiceImpl implements ReportService {
                 endDate
         );
 
-        List<Budget> allBudgets = new ArrayList<>();
-
-
-        LocalDate currentDate = startDate;
-
-        while (!currentDate.isAfter(endDate)) {
-            int month = currentDate.getMonthValue();
-            int year = currentDate.getYear();
-
-
-            List<Budget> budgets = budgetService.findByUserIdAndMonthAndYear(
-                    userId,
-                    month,
-                    year
-            );
-            allBudgets.addAll(budgets);
-
-
-            currentDate = currentDate.plusMonths(1);
-        }
+        List<Budget> allBudgets = budgetService.find(
+                userId,
+                startDate,
+                endDate
+        );
 
 
         report.setIncomes(allIncomes);

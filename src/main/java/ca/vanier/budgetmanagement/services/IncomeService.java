@@ -22,7 +22,7 @@ public interface IncomeService {
 
     List<Income> find(long userid, LocalDate startDate, LocalDate endDate);
 
-    List<Income> find(long userid, LocalDate startDate, LocalDate endDate, String incomeType);
+    List<Income> find(Long userid, String incomeType, LocalDate startDate, LocalDate endDate);
 
     List<Income> find(long userid, String incomeType);
 
