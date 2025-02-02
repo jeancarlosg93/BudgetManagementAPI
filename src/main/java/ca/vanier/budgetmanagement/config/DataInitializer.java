@@ -84,7 +84,7 @@ public class DataInitializer {
                                                                 LocalDate.now().minusDays(25), BONUS),
                                                 createIncome(2500.00, "Stock dividends", users.get(2),
                                                                 LocalDate.now().minusDays(30), DIVIDEND)));
-                incomes.forEach(list -> list.forEach(income -> incomeService.save(income.getUser().getId(), income)));
+                incomes.forEach(list -> list.forEach(income -> incomeService.save(income)));
         }
 
         private List<ExpenseCategory> addExpenseCategories(List<User> users) {

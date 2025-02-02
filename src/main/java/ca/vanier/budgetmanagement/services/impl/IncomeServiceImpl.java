@@ -27,14 +27,14 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Transactional
     @Override
-    public Income save(long userId, Income income) {
+    public Income save(Income income) {
         GlobalLogger.info(IncomeServiceImpl.class, "Saving income: {}", income.toString());
 
         IncomeValidator.validateIncome(income);
 
         if (income.getUser() != null) {
             try {
-                User user = userService.findById(userId)
+                User user = userService.findById(income.getUser().getId())
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 user.getIncomes().add(income);
                 income.setUser(user);
@@ -91,7 +91,8 @@ public class IncomeServiceImpl implements IncomeService {
             Income existingIncome = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Income not found"));
 
-            if (incomeDetails.getUser() != null && !incomeDetails.getUser().getId().equals(existingIncome.getUser().getId())) {
+            if (incomeDetails.getUser() != null
+                    && !incomeDetails.getUser().getId().equals(existingIncome.getUser().getId())) {
                 existingIncome.getUser().getIncomes().remove(existingIncome);
                 GlobalLogger.info(IncomeServiceImpl.class, "Removed income from previous user");
             }
@@ -117,10 +118,9 @@ public class IncomeServiceImpl implements IncomeService {
         }
     }
 
-
     @Override
     public List<Income> findWithFilters(long userId, String incomeType,
-                                        LocalDate startDate, LocalDate endDate) {
+            LocalDate startDate, LocalDate endDate) {
         boolean hasIncomeType = incomeType != null;
         boolean hasDateRange = startDate != null && endDate != null;
 
@@ -172,7 +172,8 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public List<Income> find(long userid, LocalDate startDate, LocalDate endDate) {
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, start date: {} and end date: {}", userid, startDate, endDate);
+        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, start date: {} and end date: {}",
+                userid, startDate, endDate);
 
         try {
             List<Income> incomes = find(userid).stream()
@@ -189,7 +190,9 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public List<Income> find(Long userid, String incomeType, LocalDate startDate, LocalDate endDate) {
         IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, start date: {}, end date: {} and income type: {}", userid, startDate, endDate, incomeType);
+        GlobalLogger.info(IncomeServiceImpl.class,
+                "Finding incomes by user id: {}, start date: {}, end date: {} and income type: {}", userid, startDate,
+                endDate, incomeType);
 
         try {
             List<Income> incomes = find(userid, startDate, endDate).stream()
@@ -206,13 +209,13 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public List<Income> find(long userid, String incomeType) {
         IncomeValidator.validateIncomeType(incomeType);
-        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {} and income type: {}", userid, incomeType);
+        GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {} and income type: {}", userid,
+                incomeType);
 
         try {
-            List<Income> incomes =
-                    find(userid).stream()
-                            .filter(income -> income.getType().name().equals(incomeType))
-                            .toList();
+            List<Income> incomes = find(userid).stream()
+                    .filter(income -> income.getType().name().equals(incomeType))
+                    .toList();
             GlobalLogger.info(IncomeServiceImpl.class, "Found {} incomes for user id: {}", incomes.size(), userid);
             return incomes;
         } catch (IllegalArgumentException e) {
@@ -222,7 +225,8 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     private User getUser(long userId) {
-        return userService.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        return userService.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
     }
 

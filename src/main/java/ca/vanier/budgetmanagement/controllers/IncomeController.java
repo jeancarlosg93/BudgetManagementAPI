@@ -21,12 +21,15 @@ public class IncomeController {
     // request can be made to /api/income/user/{userId}
     // with optional query parameters incomeType, startDate, and endDate
     // startDate and endDate must be in the format yyyy-MM-dd
-    // incomeType must be one of the following: SALARY, BONUS, INTEREST, DIVIDEND, OTHER
-    // if no query parameters are provided, all incomes for the user will be returned
+    // incomeType must be one of the following: SALARY, BONUS, INTEREST, DIVIDEND,
+    // OTHER
+    // if no query parameters are provided, all incomes for the user will be
+    // returned
     // if any query parameters are invalid, a bad request response will be returned
     // if the user does not exist, a not found response will be returned
     // if the user has no incomes, an empty list will be returned
-    //example request: /api/income/user/1?incomeType=SALARY&startDate=2021-01-01&endDate=2021-12-31
+    // example request:
+    // /api/income/user/1?incomeType=SALARY&startDate=2021-01-01&endDate=2021-12-31
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Income>> findIncomes(
@@ -42,11 +45,10 @@ public class IncomeController {
         }
     }
 
-
-    @PostMapping("/save/user/{userId}")
-    public ResponseEntity<?> saveIncome(@PathVariable("userId") long userId, @RequestBody Income income) {
+    @PostMapping("/save")
+    public ResponseEntity<?> saveIncome(@RequestBody Income income) {
         try {
-            Income savedIncome = incomeService.save(userId, income);
+            Income savedIncome = incomeService.save(income);
             return new ResponseEntity<>(savedIncome, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -81,6 +83,5 @@ public class IncomeController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
-
 
 }

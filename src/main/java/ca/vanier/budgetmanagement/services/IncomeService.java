@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface IncomeService {
 
-    Income save(long userId, Income income);
+    Income save(Income income);
 
     List<Income> findAll();
 
@@ -27,7 +27,5 @@ public interface IncomeService {
     List<Income> find(long userid, String incomeType);
 
     List<Income> findWithFilters(long userId, String incomeType, LocalDate startDate, LocalDate endDate);
-
-
 
 }
