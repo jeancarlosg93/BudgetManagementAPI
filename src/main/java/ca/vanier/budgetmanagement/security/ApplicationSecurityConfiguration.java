@@ -18,8 +18,8 @@ public class ApplicationSecurityConfiguration {
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
 
-
-    public ApplicationSecurityConfiguration(PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) {
+    public ApplicationSecurityConfiguration(PasswordEncoder passwordEncoder,
+            CustomUserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
     }
@@ -37,21 +37,21 @@ public class ApplicationSecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/user/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/user/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/user/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/expense-category/**").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/expense-category/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/api/expense-category/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/expense-category/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/expense-category/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/expense-category/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/expense-category/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/expense-category/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/income/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/income/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/income/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/income/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/income/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/reports/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/api/reports/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/reports/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/reports/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/reports/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/reports/**").hasAnyRole("USER", "ADMIN")
 
-
-                        .anyRequest().authenticated()).userDetailsService(userDetailsService)
+                        .anyRequest().authenticated())
+                .userDetailsService(userDetailsService)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
 
