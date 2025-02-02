@@ -125,7 +125,7 @@ public class IncomeServiceImpl implements IncomeService {
         boolean hasDateRange = startDate != null && endDate != null;
 
         if (hasIncomeType && hasDateRange) {
-            return find(userId, startDate, endDate, incomeType);
+            return find(userId, incomeType, startDate, endDate);
         } else if (hasDateRange) {
             return find(userId, startDate, endDate);
         } else if (hasIncomeType) {
@@ -157,8 +157,11 @@ public class IncomeServiceImpl implements IncomeService {
         GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}", userId);
 
         try {
-            User user = getUser(userId);
-            List<Income> incomes = new ArrayList<>(user.getIncomes());
+            Optional<User> user = userService.findById(userId);
+            List<Income> incomes = new ArrayList<>();
+            if (user.isPresent()) {
+                incomes = user.get().getIncomes();
+            }
             GlobalLogger.info(IncomeServiceImpl.class, "Found {} incomes for user id: {}", incomes.size(), userId);
             return incomes;
         } catch (IllegalArgumentException e) {
@@ -184,7 +187,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public List<Income> find(long userid, LocalDate startDate, LocalDate endDate, String incomeType) {
+    public List<Income> find(Long userid, String incomeType, LocalDate startDate, LocalDate endDate) {
         IncomeValidator.validateIncomeType(incomeType);
         GlobalLogger.info(IncomeServiceImpl.class, "Finding incomes by user id: {}, start date: {}, end date: {} and income type: {}", userid, startDate, endDate, incomeType);
 

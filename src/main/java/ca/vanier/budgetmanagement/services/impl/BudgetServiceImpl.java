@@ -10,14 +10,14 @@ import ca.vanier.budgetmanagement.services.ExpenseService;
 import ca.vanier.budgetmanagement.services.UserService;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
+import ca.vanier.budgetmanagement.validators.ExpenseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 
 @Service
 public class BudgetServiceImpl implements BudgetService {
@@ -73,16 +73,6 @@ public class BudgetServiceImpl implements BudgetService {
         return budgetOpt;
     }
 
-    @Override
-    public List<Budget> findByUserId(Long userId) {
-        List<Budget> budgets = budgetRepository.findAll().stream()
-                .filter(budget -> budget.getUser().getId().equals(userId))
-                .collect(Collectors.toList());
-
-        budgets.forEach(this::calculateBudgetStatus);
-        return budgets;
-    }
-
     @Transactional
     @Override
     public void deleteBudget(Long id) {
@@ -121,69 +111,123 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
 
-    @Override
-    public List<Budget> findByUserIdAndMonthAndYear(Long userId, int month, int year) {
-        List<Budget> budgets = budgetRepository.findAll().stream()
-                .filter(budget ->
-                        budget.getUser().getId().equals(userId) &&
-                                budget.getStartDate().getMonthValue() == month &&
-                                budget.getStartDate().getYear() == year)
-                .collect(Collectors.toList());
-        budgets.forEach(this::calculateBudgetStatus);
-        return budgets;
+    public List<Budget> find(Long userId) {
+        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {}", userId);
+        try {
+            User user = userService.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            List<Budget> budgets = budgetRepository.findAll().stream()
+                    .filter(budget -> budget.getUser().getId().equals(user.getId()))
+                    .toList();
+            budgets.forEach(this::calculateBudgetStatus);
+            return budgets;
+        } catch (Exception e) {
+            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {}: {}", userId, e.getMessage());
+            throw e;
+        }
+
     }
 
-
-    @Override
-    public List<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId) {
-        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets by user id {} and category id: {}", userId, categoryId);
-
-        List<Budget> budgets = findByUserId(userId).stream()
-                .filter(budget -> budget.getCategory().getId().equals(categoryId))
-                .toList();
-        budgets.forEach(this::calculateBudgetStatus);
-        return budgets;
+    public List<Budget> find(Long userId, Long categoryId) {
+        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and category with id: {}", userId, categoryId);
+        try {
+            List<Budget> budgets = find(userId).stream()
+                    .filter(budget -> budget.getCategory().getId().equals(categoryId))
+                    .toList();
+            budgets.forEach(this::calculateBudgetStatus);
+            return budgets;
+        } catch (Exception e) {
+            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {} and category with id {}: {}", userId, categoryId, e.getMessage());
+            throw e;
+        }
     }
 
-    @Override
-    public List<Budget> findByUserIdAndMonthAndYearAndCategory(Long userId, int month, int year, String Category) {
-        List<Budget> budgets = findByUserIdAndMonthAndYear(userId, month, year).stream()
-                .filter(budget -> budget.getCategory().getName().equals(Category))
-                .toList();
-        budgets.forEach(this::calculateBudgetStatus);
-        return budgets;
+    public List<Budget> find(Long userId, LocalDate startDate, LocalDate endDate) {
+        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and date range: {} to {}", userId, startDate, endDate);
+        try {
+            List<Budget> budgets = find(userId).stream()
+                    .filter(budget ->
+                            (budget.getStartDate().isAfter(startDate) || budget.getStartDate().isEqual(startDate)) &&
+                                    (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(endDate))).toList();
+            budgets.forEach(this::calculateBudgetStatus);
+            return budgets;
+        } catch (Exception e) {
+            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {} and date range: {} to {}: {}", userId, startDate, endDate, e.getMessage());
+            throw e;
+        }
     }
 
-    @Override
-    public List<Budget> findByUseridAndCategory(Long userId, String Category) {
-        List<Budget> budgets = findByUserId
-                (userId).stream()
-                .filter(budget -> budget.getCategory().getName().equals(Category))
-                .toList();
-        budgets.forEach(this::calculateBudgetStatus);
-        return budgets;
+    public List<Budget> find(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
+        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {}, category with id: {}, and date range: {} to {}", userId, categoryId, startDate, endDate);
+        try {
+            List<Budget> budgets = find(userId, categoryId).stream()
+                    .filter(budget -> !budget.getStartDate().isBefore(startDate) && !budget.getEndDate().isAfter(endDate))
+                    .toList();
+            budgets.forEach(this::calculateBudgetStatus);
+            return budgets;
+        } catch (Exception e) {
+            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {}, category with id {}, and date range: {} to {}: {}", userId, categoryId, startDate, endDate, e.getMessage());
+            throw e;
+        }
     }
+
+    public List<Budget> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
+
+        boolean hasCategoryId = categoryId != null;
+        boolean hasDateRange = startDate != null && endDate != null;
+        if (hasCategoryId) {
+            ExpenseValidator.validateExpenseCategory(categoryId, userId);
+
+        }
+        try {
+            if (hasCategoryId && hasDateRange) {
+                return find(userId, categoryId, startDate, endDate);
+            } else if (hasDateRange) {
+                return find(userId, startDate, endDate);
+            } else if (hasCategoryId) {
+                return find(userId, categoryId);
+            } else {
+                return find(userId);
+            }
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenses: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     // Calculate the budget status
     // This method calculates the actual expenses for a budget
     // by summing the expenses for the budget's user, category, and month
     // and setting the budget's actual expenses and remaining amount
     public void calculateBudgetStatus(Budget budget) {
-        List<Expense> expenses = expenseService.findByUserIdAndCategoryIdAndMonthAndYear(
+
+        List<Expense> expenses = expenseService.find(
                 budget.getUser().getId(),
-                budget.getCategory().getId(),
-                budget.getStartDate().getMonthValue(),
-                budget.getStartDate().getYear()
+                budget.getCategory().getId()
         );
 
-        double totalExpenses = expenses.stream()
-                .filter(expense ->
-                        !expense.getDate().isBefore(budget.getStartDate()) &&
-                                !expense.getDate().isAfter(budget.getEndDate())
-                )
-                .mapToDouble(Expense::getAmount)
-                .sum();
+        // In BudgetServiceImpl.calculateBudgetStatus()
+        GlobalLogger.info(BudgetServiceImpl.class, "Total expenses fetched: {}", expenses.size());
+        int count = 0;
+        for (Expense expense : expenses) {
+            if (expense.getDate() != null &&
+                    !expense.getDate().isBefore(budget.getStartDate()) &&
+                    !expense.getDate().isAfter(budget.getEndDate())) {
+                count++;
+            }
+        }
+        GlobalLogger.info(BudgetServiceImpl.class, "Expenses within date range: {}", count);
 
+        // Then filter the dates manually to match the budget's date range
+        double totalExpenses = 0.0;
+        for (Expense expense : expenses) {
+            if (expense.getDate() != null &&
+                    !expense.getDate().isBefore(budget.getStartDate()) &&
+                    !expense.getDate().isAfter(budget.getEndDate())) {
+                double amount = expense.getAmount();
+                totalExpenses += amount;
+            }
+        }
 
         budget.setActualExpenses(totalExpenses);
 

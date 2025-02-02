@@ -1,7 +1,9 @@
 package ca.vanier.budgetmanagement.services;
 
 import ca.vanier.budgetmanagement.entities.Budget;
+import ca.vanier.budgetmanagement.entities.Expense;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,15 +18,15 @@ public interface BudgetService {
 
     Optional<Budget> findById(Long id);
 
-    List<Budget> findByUserId(Long userId);
+    List<Budget> find(Long userId);
 
-    List<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId);
+    List<Budget> find(Long userId, Long categoryId);
 
-    List<Budget> findByUserIdAndMonthAndYearAndCategory(Long userId, int month, int year, String Category);
+    List<Budget> find(Long userId, LocalDate startDate, LocalDate endDate);
 
-    List<Budget> findByUseridAndCategory(Long userId, String Category);
+    List<Budget> find(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate);
 
-    List<Budget> findByUserIdAndMonthAndYear(Long userId, int month, int year);
+    List<Budget> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate);
 
     void calculateBudgetStatus(Budget budget);
 }

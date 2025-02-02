@@ -14,11 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Month;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -56,7 +55,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             try {
                 ExpenseCategory category = expenseCategoryService.findById(expense.getCategory().getId())
                         .orElseThrow(() -> new IllegalArgumentException("ExpenseCategory not found"));
-                ExpenseValidator.validateExpenseCategory(category.getUser().getId(),expense.getUser().getId());
+                ExpenseValidator.validateExpenseCategory(category.getUser().getId(), expense.getUser().getId());
                 expense.setCategory(category);
                 GlobalLogger.info(ExpenseServiceImpl.class, "Associated expense with expenseCategory id: {}",
                         category.getId());
@@ -66,8 +65,6 @@ public class ExpenseServiceImpl implements ExpenseService {
             }
         }
 
-
-        
 
         Expense savedExpense = expenseRepository.save(expense);
         GlobalLogger.info(ExpenseServiceImpl.class, "Expense saved successfully with id: {}", savedExpense.getId());
@@ -115,22 +112,6 @@ public class ExpenseServiceImpl implements ExpenseService {
             Expense existingExpense = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Expense not found"));
 
-            // if (expenseDetails.getUser() != null &&
-            // !expenseDetails.getUser().getId().equals(existingExpense.getUser().getId()))
-            // {
-            // existingExpense.getUser().getExpenses().remove(existingExpense);
-            // GlobalLogger.info(ExpenseServiceImpl.class, "Removed expense from previous
-            // user");
-            // }
-
-            // assert expenseDetails.getUser() != null;
-            // User newUser = userService.findById(expenseDetails.getUser().getId())
-            // .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            // newUser.getExpenses().add(existingExpense);
-            // existingExpense.setUser(newUser);
-            // GlobalLogger.info(ExpenseServiceImpl.class, "Associated expense with new user
-            // id: {}", newUser.getId());
-
             existingExpense.setAmount(expenseDetails.getAmount());
             existingExpense.setDescription(expenseDetails.getDescription());
             existingExpense.setDate(expenseDetails.getDate());
@@ -163,7 +144,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> findByUserId(Long userId) {
+    public List<Expense> find(Long userId) {
         GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {}", userId);
 
         try {
@@ -177,107 +158,73 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
     }
 
-    public List<Expense> findByUserIdAndMonth(Long userId, int month) {
-
-        ExpenseValidator.validateMonth(month);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} and month: {}", userId, month);
-
-        return findByUserId(userId)
-                .stream().filter(expense -> expense.getDate() != null &&
-                        expense.getDate().getMonth().equals(Month.of(month)))
-                .collect(Collectors.toList());
+    @Override
+    public List<Expense> find(Long userid, LocalDate startDate, LocalDate endDate) {
+        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} between dates: {} and {}", userid,
+                startDate, endDate);
+        try {
+            return find(userid).stream()
+                    .filter(expense -> expense.getDate() != null &&
+                            (expense.getDate().isAfter(startDate) || expense.getDate().isEqual(startDate)) &&
+                            (expense.getDate().isBefore(endDate) || expense.getDate().isEqual(endDate)))
+                    .toList();
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenses: {}", e.getMessage());
+            throw e;
+        }
     }
 
-    public List<Expense> findByUserIdAndYear(Long userId, int year) {
-        ExpenseValidator.validateYear(year);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} and year: {}", userId, year);
-        return findByUserId(userId).stream().filter(expense -> expense.getDate().getYear() == year)
-                .collect(Collectors.toList());
-
+    @Override
+    public List<Expense> find(Long userid, LocalDate startDate, LocalDate endDate, Long category) {
+        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} between dates: {} and {} and category: {}", userid,
+                startDate, endDate, category);
+        try {
+            return find(userid, startDate, endDate).stream()
+                    .filter(expense -> expense.getCategory().getId().equals(category))
+                    .toList();
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenses: {}", e.getMessage());
+            throw e;
+        }
     }
 
-    public List<Expense> findByUserIdAndMonthAndYear(Long userId, int month, int year) {
-
-        ExpenseValidator.validateMonth(month);
-        ExpenseValidator.validateYear(year);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {}, month: {} and year: {}", userId,
-                month, year);
-        return findByUserIdAndYear(userId, year).stream()
-                .filter(expense -> expense.getDate().getMonth().equals(Month.of(month)))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Expense> findByUserIdAndMonthAndYearAndCategoryId(Long userId, int month, int year,
-            Long categoryId) {
-
-        ExpenseValidator.validateMonth(month);
-        ExpenseValidator.validateYear(year);
-        ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
-        GlobalLogger.info(ExpenseServiceImpl.class,
-                "Finding expenses by user id: {}, month: {}, year: {} and categoryId: {}", userId, month, year,
-                categoryId);
-        return findByUserIdAndMonthAndYear(userId, month, year)
-                .stream().filter(expense -> expense.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Expense> findByUserIdAndCategoryId(Long userId, Long categoryId) {
-
-        ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} and categoryId: {}", userId,
-                categoryId);
-        return findByUserId(userId)
-                .stream().filter(expense -> expense.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
-    }
-
-    public List<Expense> findByUserIdAndYearAndCategoryId(Long userId, int year, Long categoryId) {
-        ExpenseValidator.validateYear(year);
-        ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {}, year: {} and categoryId: {}",
-                userId, year, categoryId);
-        return findByUserIdAndYear(userId, year)
-                .stream().filter(expense -> expense.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
+    @Override
+    public List<Expense> find(Long userid, Long category) {
+        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {} and category: {}", userid, category);
+        try {
+            return find(userid).stream()
+                    .filter(expense -> expense.getCategory().getId().equals(category))
+                    .toList();
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenses: {}", e.getMessage());
+            throw e;
+        }
 
     }
 
-    public List<Expense> findByUserIdAndCategoryIdAndMonth(Long userId, Long categoryId, int month) {
+    @Override
+    public List<Expense> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
 
-        ExpenseValidator.validateMonth(month);
-        ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {}, month: {} and categoryId: {}",
-                userId, month, categoryId);
-        return findByUserIdAndMonth(userId, month)
-                .stream().filter(expense -> expense.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
 
-    }
-
-    public List<Expense> findByUserIdAndCategoryIdAndYear(Long userId, Long categoryId, int year) {
-        ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
-        ExpenseValidator.validateYear(year);
-        GlobalLogger.info(ExpenseServiceImpl.class, "Finding expenses by user id: {}, year: {} and categoryId: {}",
-                userId, year, categoryId);
-        return findByUserIdAndYear(userId, year)
-                .stream().filter(expense -> expense.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
-
-    }
-
-    public List<Expense> findByUserIdAndCategoryIdAndMonthAndYear(Long userId, Long categoryId, int month,
-            int year) {
-
-        ExpenseValidator.validateMonth(month);
-        ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
-        GlobalLogger.info(ExpenseServiceImpl.class,
-                "Finding expenses by user id: {}, month: {}, year: {} and categoryId: {}", userId, month, year,
-                categoryId);
-        return findByUserIdAndMonthAndYear(userId, month, year)
-                .stream().filter(expense -> expense.getCategory().getId().equals(categoryId))
-                .collect(Collectors.toList());
+        boolean hasCategoryId = categoryId != null;
+        boolean hasDateRange = startDate != null && endDate != null;
+        if (hasCategoryId) {
+            ExpenseValidator.validateExpenseCategory(getExpenseCategoryUserIdByExpenseCategoryId(categoryId), userId);
+        }
+        try {
+            if (hasCategoryId && hasDateRange) {
+                return find(userId, startDate, endDate, categoryId);
+            } else if (hasDateRange) {
+                return find(userId, startDate, endDate);
+            } else if (hasCategoryId) {
+                return find(userId, categoryId);
+            } else {
+                return find(userId);
+            }
+        } catch (IllegalArgumentException e) {
+            GlobalLogger.warn(ExpenseServiceImpl.class, "Failed to find expenses: {}", e.getMessage());
+            throw e;
+        }
     }
 
     private User getUser(long userId) {
