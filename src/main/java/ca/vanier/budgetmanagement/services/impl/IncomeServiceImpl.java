@@ -83,8 +83,6 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public Income updateExistingIncome(Long id, Income incomeDetails) {
 
-        IncomeValidator.validateIncome(incomeDetails);
-
         GlobalLogger.info(IncomeServiceImpl.class, "Updating income with id: {}", id);
 
         try {
@@ -97,17 +95,26 @@ public class IncomeServiceImpl implements IncomeService {
                 GlobalLogger.info(IncomeServiceImpl.class, "Removed income from previous user");
             }
 
-            assert incomeDetails.getUser() != null;
-            User newUser = userService.findById(incomeDetails.getUser().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            newUser.getIncomes().add(existingIncome);
-            existingIncome.setUser(newUser);
-            GlobalLogger.info(IncomeServiceImpl.class, "Associated income with new user id: {}", newUser.getId());
+            if (incomeDetails.getUser() != null) {
+                User newUser = userService.findById(incomeDetails.getUser().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                newUser.getIncomes().add(existingIncome);
+                existingIncome.setUser(newUser);
+                GlobalLogger.info(IncomeServiceImpl.class, "Associated income with new user id: {}", newUser.getId());
+            }
 
             existingIncome.setAmount(incomeDetails.getAmount());
-            existingIncome.setDescription(incomeDetails.getDescription());
-            existingIncome.setDate(incomeDetails.getDate());
-            existingIncome.setType(incomeDetails.getType());
+            if (incomeDetails.getDescription() != null) {
+                existingIncome.setDescription(incomeDetails.getDescription());
+            }
+            if (incomeDetails.getDate() != null) {
+                existingIncome.setDate(incomeDetails.getDate());
+            }
+            if (incomeDetails.getType() != null) {
+                existingIncome.setType(incomeDetails.getType());
+            }
+
+            IncomeValidator.validateIncome(existingIncome);
 
             Income updatedIncome = incomeRepository.save(existingIncome);
             GlobalLogger.info(IncomeServiceImpl.class, "Income updated successfully: {}", updatedIncome);
