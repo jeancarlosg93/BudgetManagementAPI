@@ -118,20 +118,31 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public Expense updateExistingExpense(Long id, Expense expenseDetails) {
 
-        ExpenseValidator.validateExpense(expenseDetails);
-
         GlobalLogger.info(ExpenseServiceImpl.class, "Updating expense with id: {}", id);
 
         try {
             Expense existingExpense = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Expense not found"));
 
-            existingExpense.setAmount(expenseDetails.getAmount());
-            existingExpense.setDescription(expenseDetails.getDescription());
-            existingExpense.setDate(expenseDetails.getDate());
-            existingExpense.setCategory(expenseDetails.getCategory());
+            if (expenseDetails.getCategory() != null) {
+                ExpenseCategory category = expenseCategoryService.findById(expenseDetails.getCategory().getId())
+                        .orElseThrow(
+                                () -> new IllegalArgumentException(
+                                        "Expense Cateory not found when attempting to update Expense"));
+                ExpenseValidator.validateExpenseCategory(category.getUser().getId(), existingExpense.getUser().getId());
+                existingExpense.setCategory(category);
+            }
 
-            Expense updatedExpense = expenseRepository.save(expenseDetails);
+            existingExpense.setAmount(expenseDetails.getAmount());
+            if (expenseDetails.getDescription() != null) {
+                existingExpense.setDescription(expenseDetails.getDescription());
+            }
+            if (expenseDetails.getDate() != null) {
+                existingExpense.setDate(expenseDetails.getDate());
+            }
+            ExpenseValidator.validateExpense(existingExpense);
+
+            Expense updatedExpense = expenseRepository.save(existingExpense);
             GlobalLogger.info(ExpenseServiceImpl.class, "Expense updated successfully: {}", updatedExpense);
             return updatedExpense;
         } catch (IllegalArgumentException e) {
