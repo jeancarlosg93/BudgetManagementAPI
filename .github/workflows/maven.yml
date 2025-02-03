@@ -34,21 +34,18 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Run Tests
-        run: mvn test
-
-      - name: Generate Test Report
-        run: mvn surefire-report:report
-        if: always()
+      - name: Run Tests & Generate Reports
+        run: |
+          mvn test
+          mvn surefire-report:report-only
+          mvn site -DgenerateReports=false
 
       - name: Upload Test Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-report-${{ github.run_id }}
-          path: |
-            target/surefire-reports
-            target/site
+          path: target/site
           include-hidden-files: true
 
   build:
