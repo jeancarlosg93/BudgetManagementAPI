@@ -29,7 +29,6 @@ public class BudgetServiceImpl implements BudgetService {
     final private ExpenseCategoryService categoryService;
     final private ExpenseService expenseService;
 
-
     // Save a budget
     @Transactional
     @Override
@@ -80,10 +79,10 @@ public class BudgetServiceImpl implements BudgetService {
         GlobalLogger.info(BudgetServiceImpl.class, "Budget deleted successfully with id: {}", id);
     }
 
-
     // Update an existing budget
     // This method updates the budget with the given id
-    // by setting the budget's amount, name, description, start date, end date, and category
+    // by setting the budget's amount, name, description, start date, end date, and
+    // category
     // and saving the updated budget
     @Transactional
     @Override
@@ -94,10 +93,18 @@ public class BudgetServiceImpl implements BudgetService {
                 .orElseThrow(() -> new IllegalArgumentException("Budget not found"));
 
         existingBudget.setAmount(budgetDetails.getAmount());
-        existingBudget.setName(budgetDetails.getName());
-        existingBudget.setDescription(budgetDetails.getDescription());
-        existingBudget.setStartDate(budgetDetails.getStartDate());
-        existingBudget.setEndDate(budgetDetails.getEndDate());
+        if (budgetDetails.getName() != null) {
+            existingBudget.setName(budgetDetails.getName());
+        }
+        if (budgetDetails.getDescription() != null) {
+            existingBudget.setDescription(budgetDetails.getDescription());
+        }
+        if (budgetDetails.getStartDate() != null) {
+            existingBudget.setStartDate(budgetDetails.getStartDate());
+        }
+        if (budgetDetails.getEndDate() != null) {
+            existingBudget.setEndDate(budgetDetails.getEndDate());
+        }
 
         if (budgetDetails.getCategory() != null) {
             ExpenseCategory category = categoryService.findById(budgetDetails.getCategory().getId())
@@ -131,7 +138,7 @@ public class BudgetServiceImpl implements BudgetService {
 
     // Find budgets for a user and category
     // This method finds all budgets for the user with the given id
-        public List<Budget> find(Long userId, Long categoryId) {
+    public List<Budget> find(Long userId, Long categoryId) {
         GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and category with id: {}",
                 userId, categoryId);
         try {
@@ -156,10 +163,11 @@ public class BudgetServiceImpl implements BudgetService {
                 userId, startDate, endDate);
         try {
             List<Budget> budgets = find(userId).stream()
-                    .filter(budget ->
-                            (budget.getStartDate().isAfter(startDate) || budget.getStartDate().isEqual(startDate)) &&
-                                    (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(
-                                            endDate))).toList();
+                    .filter(budget -> (budget.getStartDate().isAfter(startDate)
+                            || budget.getStartDate().isEqual(startDate)) &&
+                            (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(
+                                    endDate)))
+                    .toList();
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
         } catch (Exception e) {
@@ -192,8 +200,8 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
-    //this method is used to find budgets with filters
-    //it will call the appropriate find method based on the filters provided
+    // this method is used to find budgets with filters
+    // it will call the appropriate find method based on the filters provided
     public List<Budget> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
 
         boolean hasCategoryId = categoryId != null;
@@ -218,7 +226,6 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
-
     // Calculate the budget status
     // This method calculates the actual expenses for a budget
     // by summing the expenses for the budget's user, category, and month
@@ -227,8 +234,7 @@ public class BudgetServiceImpl implements BudgetService {
 
         List<Expense> expenses = expenseService.find(
                 budget.getUser().getId(),
-                budget.getCategory().getId()
-        );
+                budget.getCategory().getId());
 
         GlobalLogger.info(BudgetServiceImpl.class, "Total expenses fetched: {}", expenses.size());
         int count = 0;
@@ -260,6 +266,5 @@ public class BudgetServiceImpl implements BudgetService {
                 totalExpenses,
                 budget.getRemainingAmount());
     }
-
 
 }
