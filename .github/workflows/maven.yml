@@ -46,7 +46,9 @@ jobs:
         if: always()
         with:
           name: test-report-${{ github.run_id }}
-          path: target/site
+          path: |
+            target/surefire-reports
+            target/site
           include-hidden-files: true
 
   build:
