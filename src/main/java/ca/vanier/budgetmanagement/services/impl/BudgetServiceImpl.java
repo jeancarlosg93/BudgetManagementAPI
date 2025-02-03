@@ -11,7 +11,7 @@ import ca.vanier.budgetmanagement.services.UserService;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.validators.ExpenseValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +19,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
+
 @Service
 public class BudgetServiceImpl implements BudgetService {
 
-    @Autowired
-    private BudgetRepository budgetRepository;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ExpenseCategoryService categoryService;
-
-    @Autowired
-    private ExpenseService expenseService;
+    final private BudgetRepository budgetRepository;
+    final private UserService userService;
+    final private ExpenseCategoryService categoryService;
+    final private ExpenseService expenseService;
 
 
     // Save a budget
@@ -121,14 +116,16 @@ public class BudgetServiceImpl implements BudgetService {
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
         } catch (Exception e) {
-            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {}: {}", userId, e.getMessage());
+            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {}: {}", userId,
+                    e.getMessage());
             throw e;
         }
 
     }
 
     public List<Budget> find(Long userId, Long categoryId) {
-        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and category with id: {}", userId, categoryId);
+        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and category with id: {}",
+                userId, categoryId);
         try {
             List<Budget> budgets = find(userId).stream()
                     .filter(budget -> budget.getCategory().getId().equals(categoryId))
@@ -136,36 +133,47 @@ public class BudgetServiceImpl implements BudgetService {
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
         } catch (Exception e) {
-            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {} and category with id {}: {}", userId, categoryId, e.getMessage());
+            GlobalLogger.warn(BudgetServiceImpl.class,
+                    "Failed to find budgets for user with id {} and category with id {}: {}", userId, categoryId,
+                    e.getMessage());
             throw e;
         }
     }
 
     public List<Budget> find(Long userId, LocalDate startDate, LocalDate endDate) {
-        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and date range: {} to {}", userId, startDate, endDate);
+        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and date range: {} to {}",
+                userId, startDate, endDate);
         try {
             List<Budget> budgets = find(userId).stream()
                     .filter(budget ->
                             (budget.getStartDate().isAfter(startDate) || budget.getStartDate().isEqual(startDate)) &&
-                                    (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(endDate))).toList();
+                                    (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(
+                                            endDate))).toList();
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
         } catch (Exception e) {
-            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {} and date range: {} to {}: {}", userId, startDate, endDate, e.getMessage());
+            GlobalLogger.warn(BudgetServiceImpl.class,
+                    "Failed to find budgets for user with id {} and date range: {} to {}: {}", userId, startDate,
+                    endDate, e.getMessage());
             throw e;
         }
     }
 
     public List<Budget> find(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
-        GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {}, category with id: {}, and date range: {} to {}", userId, categoryId, startDate, endDate);
+        GlobalLogger.info(BudgetServiceImpl.class,
+                "Finding budgets for user with id: {}, category with id: {}, and date range: {} to {}", userId,
+                categoryId, startDate, endDate);
         try {
             List<Budget> budgets = find(userId, categoryId).stream()
-                    .filter(budget -> !budget.getStartDate().isBefore(startDate) && !budget.getEndDate().isAfter(endDate))
+                    .filter(budget -> !budget.getStartDate().isBefore(startDate) && !budget.getEndDate().isAfter(
+                            endDate))
                     .toList();
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
         } catch (Exception e) {
-            GlobalLogger.warn(BudgetServiceImpl.class, "Failed to find budgets for user with id {}, category with id {}, and date range: {} to {}: {}", userId, categoryId, startDate, endDate, e.getMessage());
+            GlobalLogger.warn(BudgetServiceImpl.class,
+                    "Failed to find budgets for user with id {}, category with id {}, and date range: {} to {}: {}",
+                    userId, categoryId, startDate, endDate, e.getMessage());
             throw e;
         }
     }

@@ -3,7 +3,6 @@ package ca.vanier.budgetmanagement.security;
 import lombok.Getter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,7 +18,8 @@ public class ApplicationSecurityConfiguration {
     private final CustomUserDetailsService userDetailsService;
 
 
-    public ApplicationSecurityConfiguration(PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) {
+    public ApplicationSecurityConfiguration(PasswordEncoder passwordEncoder,
+                                            CustomUserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
     }
@@ -33,22 +33,7 @@ public class ApplicationSecurityConfiguration {
 
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/user/**").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/user/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/user/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/user/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/expense-category/**").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/expense-category/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/api/expense-category/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/expense-category/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/income/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/income/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/income/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/income/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/reports/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/api/reports/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/reports/**").hasRole("USER")
+                        .requestMatchers("/api/**").authenticated()
 
 
                         .anyRequest().authenticated()).userDetailsService(userDetailsService)

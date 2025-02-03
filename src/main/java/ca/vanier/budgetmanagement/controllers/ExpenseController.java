@@ -2,7 +2,7 @@ package ca.vanier.budgetmanagement.controllers;
 
 import ca.vanier.budgetmanagement.entities.Expense;
 import ca.vanier.budgetmanagement.services.ExpenseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/expense")
-public class ExpenseController {
+public class ExpenseController extends BaseController {
 
-    @Autowired
-    ExpenseService expenseService;
+    final ExpenseService expenseService;
 
     // request can be made to /api/expense/user/{userId}`
     // with optional query parameters categoryId, startDate, and endDate
@@ -27,58 +28,71 @@ public class ExpenseController {
     // if the user has no incomes, an empty list will be returned
     // example request: /api/expense/user/1?categoryId=1&startDate=2021-01-01&endDate=2021-12-31
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getExpenses(@PathVariable Long userId,
-                                         @RequestParam(required = false) Long categoryId,
+    public ResponseEntity<?> getExpenses(@PathVariable Long userId, @RequestParam(required = false) Long categoryId,
                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(expenseService.findWithFilters(userId, categoryId, startDate, endDate), HttpStatus.OK);
+            return ResponseEntity.ok(expenseService.findWithFilters(userId, categoryId, startDate, endDate));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return error("find.error.user.not.found", new Object[]{userId}, locale);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Expense>> getAllExpenses() {
-        return new ResponseEntity<>(expenseService.findAll(), HttpStatus.OK);
+    public ResponseEntity<?> getAllExpenses(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        try {
+            List<Expense> expenses = expenseService.findAll();
+            if (expenses.isEmpty()) {
+                return error("find.no.results", new Object[]{}, locale);
+            }
+            return ResponseEntity.ok(expenses);
+        } catch (Exception e) {
+            return error("find.error", null, locale);
+        }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveExpense(@RequestBody Expense expense) {
+    public ResponseEntity<?> saveExpense(@RequestBody Expense expense,
+                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+
         try {
             Expense savedExpense = expenseService.save(expense);
-            return new ResponseEntity<>(savedExpense, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedExpense);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return error("expense.error.save", null, locale);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteExpense(@PathVariable Long id) {
+    public ResponseEntity<String> deleteExpense(@PathVariable Long id,
+                                                @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             expenseService.deleteExpense(id);
-            return new ResponseEntity<>("Expense deleted successfully", HttpStatus.OK);
+            return success("expense.deleted", locale);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return error("expense.error.delete", null, locale);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateExpense(@PathVariable Long id, @RequestBody Expense expenseDetails) {
+    public ResponseEntity<?> updateExpense(@PathVariable Long id, @RequestBody Expense expenseDetails,
+                                           @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             Expense updatedExpense = expenseService.updateExistingExpense(id, expenseDetails);
-            return new ResponseEntity<>(updatedExpense, HttpStatus.OK);
+            return ResponseEntity.ok(updatedExpense);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return error("expense.error.not.found", new Object[]{id}, locale);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
+    public ResponseEntity<?> getExpenseById(@PathVariable Long id,
+                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(expenseService.findById(id), HttpStatus.OK);
+            return ResponseEntity.ok(expenseService.findById(id));
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return error("expense.error.not.found", new Object[]{id}, locale);
         }
     }
 }

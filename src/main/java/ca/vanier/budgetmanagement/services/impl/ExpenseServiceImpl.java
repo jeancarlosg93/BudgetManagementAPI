@@ -10,7 +10,7 @@ import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.validators.ExpenseValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
 
-    @Autowired
-    private ExpenseRepository expenseRepository;
+    final private ExpenseRepository expenseRepository;
+    final private UserService userService;
+    final private ExpenseCategoryService expenseCategoryService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ExpenseCategoryService expenseCategoryService;
 
     @Transactional
     @Override

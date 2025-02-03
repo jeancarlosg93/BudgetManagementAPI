@@ -2,19 +2,24 @@ package ca.vanier.budgetmanagement.controllers;
 
 import ca.vanier.budgetmanagement.entities.Budget;
 import ca.vanier.budgetmanagement.services.BudgetService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Locale;
+import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/budgets")
-public class BudgetController {
-    @Autowired
-    BudgetService budgetService;
+public class BudgetController extends BaseController {
+
+
+   final BudgetService budgetService;
+
 
     // request can be made to /api/budgets/user/{userId}`
     // with optional query parameters categoryId, startDate, and endDate
@@ -25,62 +30,71 @@ public class BudgetController {
     // if the user has no budgets, an empty list will be returned
     // example request: /api/budgets/user/1?categoryId=1&startDate=2021-01-01&endDate=2021-12-31
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> find(@PathVariable Long userId,
-                                  @RequestParam(required = false) Long categoryId,
-                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<?> getBudgets(@PathVariable Long userId,
+                                        @RequestParam(required = false) Long categoryId,
+                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                        @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(budgetService.findWithFilters(userId, categoryId, startDate, endDate), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("No budgets found", HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok(budgetService.findWithFilters(userId, categoryId, startDate, endDate));
+        } catch (IllegalArgumentException e) {
+            return error("find.error.user.not.found", new Object[]{userId}, locale);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllBudgets() {
+    public ResponseEntity<?> getAllBudgets(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(budgetService.findAll(), HttpStatus.OK);
+            List<Budget> budgets = budgetService.findAll();
+            if (budgets.isEmpty()) {
+                return error("find.no.results", new Object[]{}, locale);
+            }
+            return ResponseEntity.ok(budgets);
         } catch (Exception e) {
-            return new ResponseEntity<>("No budgets found", HttpStatus.NOT_FOUND);
+            return error("find.error", null, locale);
         }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody Budget budget) {
+    public ResponseEntity<?> saveBudget(@RequestBody Budget budget,
+                                        @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(budgetService.save(budget), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            Budget savedBudget = budgetService.save(budget);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedBudget);
+        } catch (IllegalArgumentException e) {
+            return error("budget.error.save", null, locale);
         }
     }
 
-    @GetMapping("/find/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getBudgetById(@PathVariable Long id,
+                                           @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(budgetService.findById(id), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Budget with ID " + id + " not found", HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok(budgetService.findById(id));
+        } catch (IllegalArgumentException e) {
+            return error("budget.error.not.found", new Object[]{id}, locale);
         }
     }
 
-    @PutMapping("update/{id}")
-    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budgetDetails) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budgetDetails,
+                                          @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(budgetService.updateExistingBudget(id, budgetDetails), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            Budget updatedBudget = budgetService.updateExistingBudget(id, budgetDetails);
+            return ResponseEntity.ok(updatedBudget);
+        } catch (IllegalArgumentException e) {
+            return error("budget.error.not.found", new Object[]{id}, locale);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBudget(@PathVariable long id) {
+    public ResponseEntity<String> deleteBudget(@PathVariable Long id,
+                                               @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             budgetService.deleteBudget(id);
-            return new ResponseEntity<>("Budget deleted successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting the budget", HttpStatus.INTERNAL_SERVER_ERROR);
+            return success("budget.deleted", locale);
+        } catch (IllegalArgumentException e) {
+            return error("budget.error.delete", null, locale);
         }
     }
-
-
 }

@@ -4,17 +4,16 @@ import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.repositories.ExpenseCategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
 
-    @Autowired
-    private ExpenseCategoryRepository expenseCategoryRepository;
+    final private ExpenseCategoryRepository expenseCategoryRepository;
 
     @Override
     public ExpenseCategory save(ExpenseCategory expenseCategory) {

@@ -7,24 +7,21 @@ import ca.vanier.budgetmanagement.repositories.ReportRepository;
 import ca.vanier.budgetmanagement.services.*;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.validators.ReportValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    ReportRepository reportRepository;
-    @Autowired
-    UserService userService;
-    @Autowired
-    IncomeService incomeService;
-    @Autowired
-    ExpenseService expenseService;
+    final private ReportRepository reportRepository;
+    final private UserService userService;
+    final private IncomeService incomeService;
+    final private ExpenseService expenseService;
 
     @Transactional
     public Report createReport(Long userId, LocalDate startDate, LocalDate endDate) {

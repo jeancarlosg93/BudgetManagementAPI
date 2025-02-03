@@ -2,63 +2,74 @@ package ca.vanier.budgetmanagement.controllers;
 
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Locale;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
-public class UserController {
+public class UserController extends BaseController {
 
-    @Autowired
-    private UserService userService;
+    final UserService userService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> findAll() {
-
+    public ResponseEntity<?> getAllUsers(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
+            List<User> users = userService.findAll();
+            if (users.isEmpty()) {
+                return error("find.no.results", new Object[]{}, locale);
+            }
+            return ResponseEntity.ok(users);
         } catch (Exception e) {
-            return new ResponseEntity<>("No users found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        try {
-            return new ResponseEntity<>(userService.updateExistingUser(id, userDetails), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return error("find.error", null, locale);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id,
+                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("User with ID " + id + " not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting the user", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(userService.findById(id));
+        } catch (IllegalArgumentException e) {
+            return error("user.error.not.found", new Object[]{id}, locale);
         }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody User user) {
+    public ResponseEntity<?> saveUser(@RequestBody User user,
+                                      @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(userService.save(user), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            User savedUser = userService.save(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        } catch (IllegalArgumentException e) {
+            return error("user.error.save", null, locale);
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails,
+                                        @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        try {
+            User updatedUser = userService.updateExistingUser(id, userDetails);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            return error("user.error.not.found", new Object[]{id}, locale);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id,
+                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        try {
+            userService.deleteUser(id);
+            return success("user.deleted", locale);
+        } catch (IllegalArgumentException e) {
+            return error("user.error.delete", null, locale);
+        }
+    }
 }
