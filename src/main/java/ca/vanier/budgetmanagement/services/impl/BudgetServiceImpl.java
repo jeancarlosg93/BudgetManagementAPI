@@ -11,7 +11,7 @@ import ca.vanier.budgetmanagement.services.UserService;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.validators.ExpenseValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +19,16 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
+
 @Service
 public class BudgetServiceImpl implements BudgetService {
 
-    @Autowired
-    private BudgetRepository budgetRepository;
+    final private BudgetRepository budgetRepository;
+    final private UserService userService;
+    final private ExpenseCategoryService categoryService;
+    final private ExpenseService expenseService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ExpenseCategoryService categoryService;
-
-    @Autowired
-    private ExpenseService expenseService;
 
     // Save a budget
     @Transactional
@@ -93,18 +89,10 @@ public class BudgetServiceImpl implements BudgetService {
                 .orElseThrow(() -> new IllegalArgumentException("Budget not found"));
 
         existingBudget.setAmount(budgetDetails.getAmount());
-        if (budgetDetails.getName() != null) {
-            existingBudget.setName(budgetDetails.getName());
-        }
-        if (budgetDetails.getDescription() != null) {
-            existingBudget.setDescription(budgetDetails.getDescription());
-        }
-        if (budgetDetails.getStartDate() != null) {
-            existingBudget.setStartDate(budgetDetails.getStartDate());
-        }
-        if (budgetDetails.getEndDate() != null) {
-            existingBudget.setEndDate(budgetDetails.getEndDate());
-        }
+        existingBudget.setName(budgetDetails.getName());
+        existingBudget.setDescription(budgetDetails.getDescription());
+        existingBudget.setStartDate(budgetDetails.getStartDate());
+        existingBudget.setEndDate(budgetDetails.getEndDate());
 
         if (budgetDetails.getCategory() != null) {
             ExpenseCategory category = categoryService.findById(budgetDetails.getCategory().getId())
@@ -116,6 +104,7 @@ public class BudgetServiceImpl implements BudgetService {
         GlobalLogger.info(BudgetServiceImpl.class, "Budget updated successfully: {}", updatedBudget);
         return updatedBudget;
     }
+
 
     public List<Budget> find(Long userId) {
         GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {}", userId);
@@ -156,10 +145,10 @@ public class BudgetServiceImpl implements BudgetService {
                 userId, startDate, endDate);
         try {
             List<Budget> budgets = find(userId).stream()
-                    .filter(budget -> (budget.getStartDate().isAfter(startDate)
-                            || budget.getStartDate().isEqual(startDate)) &&
-                            (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(endDate)))
-                    .toList();
+                    .filter(budget ->
+                            (budget.getStartDate().isAfter(startDate) || budget.getStartDate().isEqual(startDate)) &&
+                                    (budget.getEndDate().isBefore(endDate) || budget.getEndDate().isEqual(
+                                            endDate))).toList();
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
         } catch (Exception e) {
@@ -176,8 +165,8 @@ public class BudgetServiceImpl implements BudgetService {
                 categoryId, startDate, endDate);
         try {
             List<Budget> budgets = find(userId, categoryId).stream()
-                    .filter(budget -> !budget.getStartDate().isBefore(startDate)
-                            && !budget.getEndDate().isAfter(endDate))
+                    .filter(budget -> !budget.getStartDate().isBefore(startDate) && !budget.getEndDate().isAfter(
+                            endDate))
                     .toList();
             budgets.forEach(this::calculateBudgetStatus);
             return budgets;
@@ -213,6 +202,7 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
+
     // Calculate the budget status
     // This method calculates the actual expenses for a budget
     // by summing the expenses for the budget's user, category, and month
@@ -221,7 +211,8 @@ public class BudgetServiceImpl implements BudgetService {
 
         List<Expense> expenses = expenseService.find(
                 budget.getUser().getId(),
-                budget.getCategory().getId());
+                budget.getCategory().getId()
+        );
 
         // In BudgetServiceImpl.calculateBudgetStatus()
         GlobalLogger.info(BudgetServiceImpl.class, "Total expenses fetched: {}", expenses.size());
@@ -254,5 +245,6 @@ public class BudgetServiceImpl implements BudgetService {
                 totalExpenses,
                 budget.getRemainingAmount());
     }
+
 
 }

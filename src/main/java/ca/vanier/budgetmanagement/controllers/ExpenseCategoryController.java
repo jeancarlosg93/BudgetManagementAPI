@@ -2,65 +2,74 @@ package ca.vanier.budgetmanagement.controllers;
 
 import ca.vanier.budgetmanagement.entities.ExpenseCategory;
 import ca.vanier.budgetmanagement.services.ExpenseCategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Locale;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/expense-category")
-public class ExpenseCategoryController {
+public class ExpenseCategoryController extends BaseController {
 
-    @Autowired
-    private ExpenseCategoryService categoryService;
+    final ExpenseCategoryService categoryService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> findAll() {
-
+    public ResponseEntity<?> getAllCategories(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
+            List<ExpenseCategory> categories = categoryService.findAll();
+            if (categories.isEmpty()) {
+                return error("find.no.results", new Object[]{}, locale);
+            }
+            return ResponseEntity.ok(categories);
         } catch (Exception e) {
-            return new ResponseEntity<>("No categorys found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateExpenseCategory(@PathVariable Long id,
-            @RequestBody ExpenseCategory categoryDetails) {
-        try {
-            return new ResponseEntity<>(categoryService.updateExistingExpenseCategory(id, categoryDetails),
-                    HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return error("find.error", null, locale);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    public ResponseEntity<?> getCategoryById(@PathVariable Long id,
+                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("ExpenseCategory with ID " + id + " not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteExpenseCategory(@PathVariable long id) {
-        try {
-            categoryService.deleteExpenseCategory(id);
-            return new ResponseEntity<>("ExpenseCategory deleted successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting the category", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(categoryService.findById(id));
+        } catch (IllegalArgumentException e) {
+            return error("category.error.not.found", new Object[]{id}, locale);
         }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody ExpenseCategory category) {
+    public ResponseEntity<?> saveCategory(@RequestBody ExpenseCategory category,
+                                          @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
-            return new ResponseEntity<>(categoryService.save(category), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            ExpenseCategory savedCategory = categoryService.save(category);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
+        } catch (IllegalArgumentException e) {
+            return error("category.error.save", null, locale);
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody ExpenseCategory categoryDetails,
+                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        try {
+            ExpenseCategory updatedCategory = categoryService.updateExistingExpenseCategory(id, categoryDetails);
+            return ResponseEntity.ok(updatedCategory);
+        } catch (IllegalArgumentException e) {
+            return error("category.error.not.found", new Object[]{id}, locale);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id,
+                                                 @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        try {
+            categoryService.deleteExpenseCategory(id);
+            return success("category.deleted", locale);
+        } catch (IllegalArgumentException e) {
+            return error("category.error.delete", null, locale);
+        }
+    }
 }

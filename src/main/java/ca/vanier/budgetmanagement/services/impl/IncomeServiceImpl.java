@@ -7,7 +7,7 @@ import ca.vanier.budgetmanagement.services.IncomeService;
 import ca.vanier.budgetmanagement.services.UserService;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 import ca.vanier.budgetmanagement.validators.IncomeValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class IncomeServiceImpl implements IncomeService {
 
-    @Autowired
-    private IncomeRepository incomeRepository;
-
-    @Autowired
-    private UserService userService;
+    final private IncomeRepository incomeRepository;
+    final private UserService userService;
 
     @Transactional
     @Override
