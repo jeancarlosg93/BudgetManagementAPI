@@ -15,6 +15,7 @@ import java.util.Locale;
 @RequestMapping("/api/expense-category")
 public class ExpenseCategoryController extends BaseController {
 
+
     final ExpenseCategoryService categoryService;
 
     @GetMapping("/all")

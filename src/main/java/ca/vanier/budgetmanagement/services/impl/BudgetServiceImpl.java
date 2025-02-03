@@ -80,6 +80,11 @@ public class BudgetServiceImpl implements BudgetService {
         GlobalLogger.info(BudgetServiceImpl.class, "Budget deleted successfully with id: {}", id);
     }
 
+
+    // Update an existing budget
+    // This method updates the budget with the given id
+    // by setting the budget's amount, name, description, start date, end date, and category
+    // and saving the updated budget
     @Transactional
     @Override
     public Budget updateExistingBudget(Long id, Budget budgetDetails) {
@@ -105,7 +110,8 @@ public class BudgetServiceImpl implements BudgetService {
         return updatedBudget;
     }
 
-
+    // Find budgets for a user
+    // This method finds all budgets for the user with the given id
     public List<Budget> find(Long userId) {
         GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {}", userId);
         try {
@@ -123,7 +129,9 @@ public class BudgetServiceImpl implements BudgetService {
 
     }
 
-    public List<Budget> find(Long userId, Long categoryId) {
+    // Find budgets for a user and category
+    // This method finds all budgets for the user with the given id
+        public List<Budget> find(Long userId, Long categoryId) {
         GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and category with id: {}",
                 userId, categoryId);
         try {
@@ -140,6 +148,9 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
+    // Find budgets for a user and date range
+    // This method finds all budgets for the user with the given id
+    // and with start and end dates within the given date range
     public List<Budget> find(Long userId, LocalDate startDate, LocalDate endDate) {
         GlobalLogger.info(BudgetServiceImpl.class, "Finding budgets for user with id: {} and date range: {} to {}",
                 userId, startDate, endDate);
@@ -159,6 +170,9 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
+    // Find budgets for a user, category, and date range
+    // This method finds all budgets for the user with the given id
+    // the given category id and within the given date range
     public List<Budget> find(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
         GlobalLogger.info(BudgetServiceImpl.class,
                 "Finding budgets for user with id: {}, category with id: {}, and date range: {} to {}", userId,
@@ -178,6 +192,8 @@ public class BudgetServiceImpl implements BudgetService {
         }
     }
 
+    //this method is used to find budgets with filters
+    //it will call the appropriate find method based on the filters provided
     public List<Budget> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
 
         boolean hasCategoryId = categoryId != null;
@@ -214,7 +230,6 @@ public class BudgetServiceImpl implements BudgetService {
                 budget.getCategory().getId()
         );
 
-        // In BudgetServiceImpl.calculateBudgetStatus()
         GlobalLogger.info(BudgetServiceImpl.class, "Total expenses fetched: {}", expenses.size());
         int count = 0;
         for (Expense expense : expenses) {

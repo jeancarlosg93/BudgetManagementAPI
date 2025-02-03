@@ -80,7 +80,7 @@ class IncomeServiceImplTest {
         when(incomeRepository.save(any(Income.class))).thenReturn(testIncome);
 
         // Act
-        Income savedIncome = incomeService.save(testIncome);
+        Income savedIncome = incomeService.save(testUser.getId(), testIncome);
 
         // Assert
         assertNotNull(savedIncome);
@@ -183,6 +183,45 @@ class IncomeServiceImplTest {
         assertFalse(found.isEmpty());
         assertEquals(2, found.size()); // Since we added 2 incomes in setUp
         verify(userService).findById(testUser.getId());
+    }
+
+    @Test
+    void whenFindByDateRange_thenReturnIncomes() {
+        // Arrange
+        LocalDate startDate = LocalDate.now().minusDays(7);
+        LocalDate endDate = LocalDate.now().plusDays(7);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.find(testUser.getId(), startDate, endDate);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        verify(userService).findById(testUser.getId());
+    }
+
+    @Test
+    void whenFindWithFilters_thenReturnFilteredIncomes() {
+        // Arrange
+        LocalDate startDate = LocalDate.now().minusDays(7);
+        LocalDate endDate = LocalDate.now().plusDays(7);
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        List<Income> found = incomeService.findWithFilters(testUser.getId(), "SALARY", startDate, endDate);
+
+        // Assert
+        assertFalse(found.isEmpty());
+        verify(userService).findById(testUser.getId());
+    }
+
+    @Test
+    void whenFindByInvalidIncomeType_thenThrowException() {
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () ->
+                incomeService.find(testUser.getId(), "INVALID_TYPE")
+        );
     }
 
 }

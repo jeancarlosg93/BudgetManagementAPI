@@ -23,12 +23,16 @@ public class ReportServiceImpl implements ReportService {
     final private IncomeService incomeService;
     final private ExpenseService expenseService;
 
+    //this method creates a report for a user based on the user id, start date, and end date
+    //if the user does not exist, an exception is thrown
     @Transactional
     public Report createReport(Long userId, LocalDate startDate, LocalDate endDate) {
         GlobalLogger.info(ReportService.class, "Creating report for user id: " + userId);
 
         Report report = new Report();
 
+
+        //calling the find method from the user service to get the user by id
         try {
             report.setUser(userService.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found")));
@@ -40,11 +44,15 @@ public class ReportServiceImpl implements ReportService {
         report.setStartDate(startDate);
         report.setEndDate(endDate);
 
+        //here we call the find method from the income service
+        // to get all incomes for the user within the specified date range
         List<Income> allIncomes = incomeService.find(
                 userId,
                 startDate,
                 endDate);
 
+        //here we call the find method from the expense service
+        // to get all expenses for the user within the specified date range
         List<Expense> allExpenses = expenseService.find(
                 userId,
                 startDate,
@@ -53,14 +61,17 @@ public class ReportServiceImpl implements ReportService {
         report.setIncomes(allIncomes);
         report.setExpenses(allExpenses);
 
+        // here we calculate the total income and total expense for the report
         double totalIncome = allIncomes.stream()
                 .mapToDouble(Income::getAmount)
                 .sum();
-
+        // here we calculate the total income and total expense for the report
         double totalExpense = allExpenses.stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();
 
+
+        // here we calculate the total income and total expense for the report
         report.setTotalIncome(totalIncome);
         report.setTotalExpense(totalExpense);
         report.setNetAmount(totalIncome - totalExpense);

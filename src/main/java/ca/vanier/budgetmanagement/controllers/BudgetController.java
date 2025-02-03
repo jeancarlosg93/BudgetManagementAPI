@@ -42,6 +42,10 @@ public class BudgetController extends BaseController {
         }
     }
 
+    // request can be made to /api/budgets/all
+    // if no budgets are found, a not found response will be returned
+    // if an error occurs, a bad request response will be returned
+    // if budgets are found, they will be returned
     @GetMapping("/all")
     public ResponseEntity<?> getAllBudgets(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {

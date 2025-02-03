@@ -206,4 +206,40 @@ class ReportServiceImplTest {
                 reportService.getReportsByUserId(99L)
         );
     }
+    @Test
+    void whenCreateReport_thenSuccess() {
+        // Arrange
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(incomeService.find(testUser.getId(), startDate, endDate)).thenReturn(testIncomes);
+        when(expenseService.find(testUser.getId(), startDate, endDate)).thenReturn(testExpenses);
+        when(reportRepository.save(any(Report.class))).thenReturn(testReport);
+
+        // Act
+        Report created = reportService.createReport(testUser.getId(), startDate, endDate);
+
+        // Assert
+        assertNotNull(created);
+        assertEquals(7000.00, created.getTotalIncome());
+        assertEquals(2500.00, created.getTotalExpense());
+        assertEquals(4500.00, created.getNetAmount());
+        verify(reportRepository).save(any(Report.class));
+    }
+
+    @Test
+    void whenCreateReportWithNoTransactions_thenCreateEmptyReport() {
+        // Arrange
+        when(userService.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(incomeService.find(testUser.getId(), startDate, endDate)).thenReturn(new ArrayList<>());
+        when(expenseService.find(testUser.getId(), startDate, endDate)).thenReturn(new ArrayList<>());
+        when(reportRepository.save(any(Report.class))).thenReturn(new Report());
+
+        // Act
+        Report created = reportService.createReport(testUser.getId(), startDate, endDate);
+
+        // Assert
+        assertNotNull(created);
+        assertEquals(0.0, created.getTotalIncome());
+        assertEquals(0.0, created.getTotalExpense());
+        assertEquals(0.0, created.getNetAmount());
+    }
 }

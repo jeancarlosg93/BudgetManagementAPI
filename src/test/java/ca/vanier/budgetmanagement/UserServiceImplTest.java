@@ -223,4 +223,31 @@ class UserServiceImplTest {
         assertEquals("User not found", exception.getMessage());
         verify(userRepository, never()).deleteById(any());
     }
+    @Test
+    void whenSaveUserWithoutRole_thenSetDefaultRole() {
+        // Arrange
+        testUser.setId(null);
+        testUser.setRole(null);
+        when(passwordEncoder.encode(any())).thenReturn("encodedPassword");
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        // Act
+        User savedUser = userService.save(testUser);
+
+        // Assert
+        assertEquals(User.ROLE_USER, savedUser.getRole());
+        verify(userRepository).save(testUser);
+    }
+
+    @Test
+    void whenFindByInvalidUsername_thenThrowException() {
+        // Arrange
+        when(userRepository.findByUsername("invalid")).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () ->
+                userService.findByUsername("invalid")
+        );
+    }
 }

@@ -10,6 +10,10 @@ import java.util.Locale;
 @Getter
 public abstract class BaseController {
 
+    //this class is used to get the message from the message source
+    //and return the response entity
+    //every controller class should extend this class
+
     @Autowired
     protected MessageSource messageSource;
 
