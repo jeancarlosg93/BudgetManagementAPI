@@ -1,6 +1,5 @@
 package ca.vanier.budgetmanagement.controllers;
 
-
 import ca.vanier.budgetmanagement.entities.Report;
 import ca.vanier.budgetmanagement.services.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import java.util.Locale;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/api/report")
 public class ReportController extends BaseController {
 
     final ReportService reportService;
@@ -29,7 +28,7 @@ public class ReportController extends BaseController {
         try {
             List<Report> reports = reportService.getAllReports();
             if (reports.isEmpty()) {
-                return error("find.no.results", new Object[]{}, locale);
+                return error("find.no.results", new Object[] {}, locale);
             }
             return ResponseEntity.ok(reports);
         } catch (Exception e) {
@@ -39,19 +38,19 @@ public class ReportController extends BaseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getReportById(@PathVariable Long id,
-                                           @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             return ResponseEntity.ok(reportService.getReportById(id));
         } catch (IllegalArgumentException e) {
-            return error("report.error.not.found", new Object[]{id}, locale);
+            return error("report.error.not.found", new Object[] { id }, locale);
         }
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createReport(@RequestParam Long userId,
-                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                          @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     reportService.createReport(userId, startDate, endDate));
@@ -62,7 +61,7 @@ public class ReportController extends BaseController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReport(@PathVariable Long id,
-                                               @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             reportService.deleteReport(id);
             return success("report.deleted", locale);
@@ -73,11 +72,11 @@ public class ReportController extends BaseController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getReportsByUserId(@PathVariable Long userId,
-                                                @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         try {
             return ResponseEntity.ok(reportService.getReportsByUserId(userId));
         } catch (IllegalArgumentException e) {
-            return error("find.error.user.not.found", new Object[]{userId}, locale);
+            return error("find.error.user.not.found", new Object[] { userId }, locale);
         }
     }
 }
