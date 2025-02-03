@@ -80,7 +80,7 @@ class IncomeServiceImplTest {
         when(incomeRepository.save(any(Income.class))).thenReturn(testIncome);
 
         // Act
-        Income savedIncome = incomeService.save(testUser.getId(), testIncome);
+        Income savedIncome = incomeService.save(testIncome);
 
         // Assert
         assertNotNull(savedIncome);
@@ -219,9 +219,7 @@ class IncomeServiceImplTest {
     void whenFindByInvalidIncomeType_thenThrowException() {
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () ->
-                incomeService.find(testUser.getId(), "INVALID_TYPE")
-        );
+        assertThrows(IllegalArgumentException.class, () -> incomeService.find(testUser.getId(), "INVALID_TYPE"));
     }
 
 }

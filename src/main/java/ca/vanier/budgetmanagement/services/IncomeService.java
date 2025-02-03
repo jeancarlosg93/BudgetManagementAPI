@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface IncomeService {
 
-    Income save(long userId, Income income);
+    Income save(Income income);
 
     List<Income> findAll();
 
