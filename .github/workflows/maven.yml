@@ -15,11 +15,45 @@ on:
     branches: [ "master" ]
 
 jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Generate Test Report
+        run: mvn surefire-report:report
+        if: always()
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-report
+          path: target/site
   build:
 
     runs-on: ubuntu-latest
 
     steps:
+    - needs: test
     - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v4
