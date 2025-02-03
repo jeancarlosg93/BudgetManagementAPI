@@ -2,6 +2,11 @@ package ca.vanier.budgetmanagement.util;
 
 import org.slf4j.Logger;
 
+
+//this class is used to get the logger
+//every class should use this class to get the logger
+//this class is used to implement logging
+
 public class GlobalLogger {
     private GlobalLogger() {
         // Prevent instantiation
@@ -11,6 +16,7 @@ public class GlobalLogger {
         return org.slf4j.LoggerFactory.getLogger(clazz);
     }
 
+    //methods to log info, debug, warn, and error messages
     public static void info(Class<?> clazz, String message) {
         getLogger(clazz).info(message);
     }

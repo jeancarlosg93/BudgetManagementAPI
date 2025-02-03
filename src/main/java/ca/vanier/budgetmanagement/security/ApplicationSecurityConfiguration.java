@@ -49,8 +49,7 @@ public class ApplicationSecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/reports/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/reports/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/reports/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/**/*.html", "/**/*.js", "/**/*.css").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/**.html", "/**.js", "/**.css").permitAll()
                         .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
                 .httpBasic(Customizer.withDefaults())
