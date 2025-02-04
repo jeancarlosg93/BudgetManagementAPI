@@ -85,12 +85,17 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+
+    // This method is used to update an existing user
+    // It takes in the id of the user to be updated and the new details of the user
     @Transactional
     @Override
     public User updateExistingUser(Long id, User userDetails) {
 
         GlobalLogger.info(UserServiceImpl.class, "Updating user with id: {}", id);
+        // Find the user by id, if not found throw an exception
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        // Update the user details if they are not null
         if (userDetails.getUsername() != null) {
             user.setUsername(userDetails.getUsername());
         }
@@ -112,6 +117,7 @@ public class UserServiceImpl implements UserService {
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
+        // Save the updated user
         User updatedUser = userRepository.save(user);
         GlobalLogger.info(UserServiceImpl.class, "User with id {} updated successfully {}", id, updatedUser.toString());
         return updatedUser;

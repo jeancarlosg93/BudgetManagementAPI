@@ -23,18 +23,23 @@ public class IncomeServiceImpl implements IncomeService {
     final private IncomeRepository incomeRepository;
     final private UserService userService;
 
+
     @Transactional
     @Override
     public Income save(Income income) {
         GlobalLogger.info(IncomeServiceImpl.class, "Saving income: {}", income.toString());
 
+        //Validate the income using the IncomeValidator class
         IncomeValidator.validateIncome(income);
 
+        //If the income has a user, associate the income with the user
         if (income.getUser() != null) {
             try {
+                //Find the user by the user id
                 User user = userService.findById(income.getUser().getId())
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 user.getIncomes().add(income);
+                //Associate the income with the user
                 income.setUser(user);
                 GlobalLogger.info(IncomeServiceImpl.class, "Associated income with user id: {}", user.getId());
             } catch (IllegalArgumentException e) {
@@ -42,7 +47,7 @@ public class IncomeServiceImpl implements IncomeService {
                 throw e;
             }
         }
-
+        //after validating the income, save the income to the database
         Income savedIncome = incomeRepository.save(income);
         GlobalLogger.info(IncomeServiceImpl.class, "Income saved successfully with id: {}", savedIncome.getId());
         return savedIncome;
@@ -60,15 +65,17 @@ public class IncomeServiceImpl implements IncomeService {
         GlobalLogger.info(IncomeServiceImpl.class, "Deleting income with id: {}", id);
 
         try {
+            //Find the income by the income id, if the income is not found, throw an exception
             Income income = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Income not found"));
 
+            //If the income has a user, remove the income from the user
             if (income.getUser() != null) {
                 income.getUser().getIncomes().remove(income);
                 income.setUser(null);
                 GlobalLogger.info(IncomeServiceImpl.class, "Removed income association from user");
             }
-
+            //Delete the income from the database
             incomeRepository.deleteById(id);
             GlobalLogger.info(IncomeServiceImpl.class, "Income with id {} deleted successfully", id);
         } catch (IllegalArgumentException e) {
@@ -84,15 +91,16 @@ public class IncomeServiceImpl implements IncomeService {
         GlobalLogger.info(IncomeServiceImpl.class, "Updating income with id: {}", id);
 
         try {
+            //Find the income by the income id, if the income is not found, throw an exception
             Income existingIncome = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Income not found"));
-
+            //If the income has a user, remove the income from the user
             if (incomeDetails.getUser() != null
                     && !incomeDetails.getUser().getId().equals(existingIncome.getUser().getId())) {
                 existingIncome.getUser().getIncomes().remove(existingIncome);
                 GlobalLogger.info(IncomeServiceImpl.class, "Removed income from previous user");
             }
-
+            //If incomeDetails has a user, associate the old income with the new user
             if (incomeDetails.getUser() != null) {
                 User newUser = userService.findById(incomeDetails.getUser().getId())
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -101,6 +109,7 @@ public class IncomeServiceImpl implements IncomeService {
                 GlobalLogger.info(IncomeServiceImpl.class, "Associated income with new user id: {}", newUser.getId());
             }
 
+            //Update the income details
             existingIncome.setAmount(incomeDetails.getAmount());
             if (incomeDetails.getDescription() != null) {
                 existingIncome.setDescription(incomeDetails.getDescription());
@@ -111,9 +120,9 @@ public class IncomeServiceImpl implements IncomeService {
             if (incomeDetails.getType() != null) {
                 existingIncome.setType(incomeDetails.getType());
             }
-
+            //Validate the updated income
             IncomeValidator.validateIncome(existingIncome);
-
+            //Save the updated income to the database
             Income updatedIncome = incomeRepository.save(existingIncome);
             GlobalLogger.info(IncomeServiceImpl.class, "Income updated successfully: {}", updatedIncome);
             return updatedIncome;
@@ -123,9 +132,12 @@ public class IncomeServiceImpl implements IncomeService {
         }
     }
 
+    //Find incomes with filters, this method is used to find incomes
+    //based on the user id, income type, start date and end date
+    //using method overloading.
     @Override
     public List<Income> findWithFilters(long userId, String incomeType,
-            LocalDate startDate, LocalDate endDate) {
+                                        LocalDate startDate, LocalDate endDate) {
         boolean hasIncomeType = incomeType != null;
         boolean hasDateRange = startDate != null && endDate != null;
 

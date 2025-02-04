@@ -1,12 +1,11 @@
 package ca.vanier.budgetmanagement.validators;
 
 import ca.vanier.budgetmanagement.entities.Expense;
-import ca.vanier.budgetmanagement.entities.ExpenseCategory;
-import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.util.GlobalLogger;
 
 public class ExpenseValidator {
 
+    //Validates if the provided month is between 1 and 12
     public static void validateMonth(int month) {
         if (month < 1 || month > 12) {
             GlobalLogger.warn(ExpenseValidator.class, "Invalid month provided: {}", month);
@@ -14,6 +13,7 @@ public class ExpenseValidator {
         }
     }
 
+    //Validates if the year is between 1900 and next year
     public static void validateYear(int year) {
         int currentYear = java.time.Year.now().getValue();
         if (year < 1900 || year > currentYear + 1) {
@@ -22,6 +22,7 @@ public class ExpenseValidator {
         }
     }
 
+    //Validates if the expense amount is non-negative
     public static void validateAmount(double amount) {
         if (amount < 0) {
             GlobalLogger.warn(ExpenseValidator.class, "Invalid amount provided: {}", amount);
@@ -29,6 +30,7 @@ public class ExpenseValidator {
         }
     }
 
+    //Performs validation on an expense object
     public static void validateExpense(Expense expense) {
         if (expense == null) {
             throw new IllegalArgumentException("Expense cannot be null");
@@ -43,6 +45,7 @@ public class ExpenseValidator {
         validateYear(expense.getDate().getYear());
     }
 
+    //Validates if the expense category belongs to the correct user
     public static void validateExpenseCategory(Long expenseCategoryUserId, Long userId) {
         if (expenseCategoryUserId != userId) {
             GlobalLogger.warn(ExpenseValidator.class,
