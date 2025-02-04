@@ -40,14 +40,17 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public Expense save(Expense expense) {
         GlobalLogger.info(ExpenseServiceImpl.class, "Saving expense: {}", expense.toString());
-
+        // Validate expense
         ExpenseValidator.validateExpense(expense);
 
+        // Associate expense with user
         if (expense.getUser() != null) {
+            // Find user and add expense to user's expenses
             try {
                 User user = userService.findById(expense.getUser().getId())
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 user.getExpenses().add(expense);
+                // Save user to update the user's expenses
                 expense.setUser(user);
                 GlobalLogger.info(ExpenseServiceImpl.class, "Associated expense with user id: {}", user.getId());
             } catch (IllegalArgumentException e) {
@@ -55,12 +58,14 @@ public class ExpenseServiceImpl implements ExpenseService {
                 throw e;
             }
         }
-
+        // Associate expense with category
         if (expense.getCategory() != null) {
+            // Find category and add expense to category's expenses
             try {
                 ExpenseCategory category = expenseCategoryService.findById(expense.getCategory().getId())
                         .orElseThrow(() -> new IllegalArgumentException("ExpenseCategory not found"));
                 ExpenseValidator.validateExpenseCategory(category.getUser().getId(), expense.getUser().getId());
+                // Save category to update the category's expenses
                 expense.setCategory(category);
                 GlobalLogger.info(ExpenseServiceImpl.class, "Associated expense with expenseCategory id: {}",
                         category.getId());
@@ -119,12 +124,13 @@ public class ExpenseServiceImpl implements ExpenseService {
     public Expense updateExistingExpense(Long id, Expense expenseDetails) {
 
         GlobalLogger.info(ExpenseServiceImpl.class, "Updating expense with id: {}", id);
-
+        // Find the expense by id, if not found throw an exception
         try {
             Expense existingExpense = findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Expense not found"));
 
             if (expenseDetails.getCategory() != null) {
+                // Find category and add expense to category's expenses
                 ExpenseCategory category = expenseCategoryService.findById(expenseDetails.getCategory().getId())
                         .orElseThrow(
                                 () -> new IllegalArgumentException(
@@ -135,11 +141,14 @@ public class ExpenseServiceImpl implements ExpenseService {
 
             existingExpense.setAmount(expenseDetails.getAmount());
             if (expenseDetails.getDescription() != null) {
+                // replace the existing description with the new description
                 existingExpense.setDescription(expenseDetails.getDescription());
             }
             if (expenseDetails.getDate() != null) {
+                // Validate the new date
                 existingExpense.setDate(expenseDetails.getDate());
             }
+            // Validate the updated expense
             ExpenseValidator.validateExpense(existingExpense);
 
             Expense updatedExpense = expenseRepository.save(existingExpense);
@@ -229,6 +238,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     }
 
+
+    //this method is used to find expenses with filters,
+    // it takes in the user id, category id, start date and end date
+    // using method overloading
     @Override
     public List<Expense> findWithFilters(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate) {
 

@@ -89,6 +89,8 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     public Report updateReport(Report report) {
         GlobalLogger.info(ReportService.class, "Updating report: " + report);
+
+        // here we validate the report
         ReportValidator.validateReport(report);
 
         Report existingReport = getReportById(report.getId());
@@ -104,12 +106,14 @@ public class ReportServiceImpl implements ReportService {
         if (report.getExpenses() != null && !report.getExpenses().isEmpty()) {
             existingReport.setExpenses(report.getExpenses());
         }
-
+        // here we calculate the total income and total expense for the report
+        // and update the report
         double totalIncome = report.getIncomes().stream()
                 .mapToDouble(Income::getAmount)
                 .sum();
         existingReport.setTotalIncome(totalIncome);
 
+        // here we calculate the total expenses and total expense for the report
         double totalExpense = report.getExpenses().stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();
