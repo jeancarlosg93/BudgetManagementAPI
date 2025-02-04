@@ -168,6 +168,10 @@ src/
 
 That's it! Each component has its specific job, making the code organized and maintainable.
 
+## Budget Report Front-End
+
+To view reports for different users, start the project with `mvn spring-boot:run` and go to `localhost:8080/`.
+
 ## API Reference
 
 ### Authentication
