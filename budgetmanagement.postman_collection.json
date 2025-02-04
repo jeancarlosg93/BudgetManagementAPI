@@ -1,0 +1,815 @@
+{
+	"info": {
+		"_postman_id": "23e901cd-ed56-4158-aa7c-91e73232e450",
+		"name": "budgetmanagement",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18660990"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{userUrl}}all",
+							"host": [
+								"{{userUrl}}all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Jeff\",\r\n    \"phone\": \"514-555-5555\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{userUrl}}2",
+							"host": [
+								"{{userUrl}}2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Jeff\",\r\n    \"phone\": \"514-555-5555\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{userUrl}}2",
+							"host": [
+								"{{userUrl}}2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Jeff\",\r\n    \"phone\": \"514-555-5555\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{userUrl}}1",
+							"host": [
+								"{{userUrl}}1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Jeff\",\r\n    \"phone\": \"514-555-5555\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{userUrl}}save",
+							"host": [
+								"{{userUrl}}save"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.environment.set(\"userUrl\", pm.collectionVariables.get(\"baseUrl\") + \"user/\");\r",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "expense",
+			"item": [
+				{
+					"name": "user/{userId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{expenseUrl}}user/1",
+							"host": [
+								"{{expenseUrl}}user"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{expenseUrl}}all",
+							"host": [
+								"{{expenseUrl}}all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"user\":{\r\n            \"id\":2\r\n        },\r\n        \"category\":{\r\n            \"id\":2\r\n        },\r\n        \"date\": \"2025-01-28\",\r\n        \"amount\": 2300.3,\r\n        \"description\": \"Test\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{expenseUrl}}save",
+							"host": [
+								"{{expenseUrl}}save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{expenseUrl}}2",
+							"host": [
+								"{{expenseUrl}}2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\r\n        \"description\": \"Test Update\",\r\n        \"category\": {\r\n            \"id\":4\r\n        }\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{expenseUrl}}2",
+							"host": [
+								"{{expenseUrl}}2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{expenseUrl}}2",
+							"host": [
+								"{{expenseUrl}}2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.environment.set(\"expenseUrl\", pm.collectionVariables.get(\"baseUrl\") + \"expense/\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "expenseCategory",
+			"item": [
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{expenseCategoryUrl}}all",
+							"host": [
+								"{{expenseCategoryUrl}}all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Housing\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{expenseCategoryUrl}}3",
+							"host": [
+								"{{expenseCategoryUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{expenseCategoryUrl}}3",
+							"host": [
+								"{{expenseCategoryUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{expenseCategoryUrl}}3",
+							"host": [
+								"{{expenseCategoryUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"New Category\",\r\n    \"user\":{\r\n        \"id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{expenseCategoryUrl}}save",
+							"host": [
+								"{{expenseCategoryUrl}}save"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.environment.set(\"expenseCategoryUrl\", pm.collectionVariables.get(\"baseUrl\") + \"expense-category/\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "income",
+			"item": [
+				{
+					"name": "user/{userId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{incomeUrl}}user/3",
+							"host": [
+								"{{incomeUrl}}user"
+							],
+							"path": [
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"id\": 3\r\n    },\r\n    \"date\": \"2024-12-19\",\r\n    \"type\": \"DIVIDEND\",\r\n    \"amount\": 34200.0,\r\n    \"description\": \"Stock dividend\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{incomeUrl}}save",
+							"host": [
+								"{{incomeUrl}}save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"date\": \"2025-01-18\",\r\n    \"type\": \"RENT\",\r\n    \"amount\": 2500.0,\r\n    \"description\": \"Renting\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{incomeUrl}}2",
+							"host": [
+								"{{incomeUrl}}2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{incomeUrl}}3",
+							"host": [
+								"{{incomeUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{incomeUrl}}3",
+							"host": [
+								"{{incomeUrl}}3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.environment.set(\"incomeUrl\", pm.collectionVariables.get(\"baseUrl\") + \"income/\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "budget",
+			"item": [
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{budgetUrl}}all",
+							"host": [
+								"{{budgetUrl}}all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user/{userId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{incomeUrl}}user/3",
+							"host": [
+								"{{incomeUrl}}user"
+							],
+							"path": [
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"id\": 3\r\n    },\r\n    \"date\": \"2024-12-19\",\r\n    \"type\": \"DIVIDEND\",\r\n    \"amount\": 34200.0,\r\n    \"description\": \"Stock dividend\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{incomeUrl}}save",
+							"host": [
+								"{{incomeUrl}}save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n        \"amount\": 250.0,\r\n        \"name\": \"Entertainment Budget\",\r\n        \"description\": \"Entertainment expenses for the month\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{budgetUrl}}3",
+							"host": [
+								"{{budgetUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{budgetUrl}}3",
+							"host": [
+								"{{budgetUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{budgetUrl}}3",
+							"host": [
+								"{{budgetUrl}}3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.environment.set(\"budgetUrl\", pm.collectionVariables.get(\"baseUrl\") + \"budget/\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "report",
+			"item": [
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{reportUrl}}all",
+							"host": [
+								"{{reportUrl}}all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{reportUrl}}3",
+							"host": [
+								"{{reportUrl}}3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{reportUrl}}create?userId=2&startDate=2025-01-01&endDate=2025-02-28",
+							"host": [
+								"{{reportUrl}}create"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "2"
+								},
+								{
+									"key": "startDate",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-02-28"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{reportUrl}}4",
+							"host": [
+								"{{reportUrl}}4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user/{userId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{incomeUrl}}user/3",
+							"host": [
+								"{{incomeUrl}}user"
+							],
+							"path": [
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.environment.set(\"reportUrl\", pm.collectionVariables.get(\"baseUrl\") + \"report/\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "admin",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.request.headers.add({\r",
+					"    key: \"Accept-Language\",\r",
+					"    value: \"fr\"\r",
+					"});\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:8080/api/",
+			"type": "string"
+		}
+	]
+}
