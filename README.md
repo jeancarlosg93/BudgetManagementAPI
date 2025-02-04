@@ -172,6 +172,8 @@ That's it! Each component has its specific job, making the code organized and ma
 
 To view reports for different users, start the project with `mvn spring-boot:run` and go to `localhost:8080/`.
 
+To run with docker use `docker run -p 8080:8080 budget-management` and go to `localhost:8080/`.
+
 ## API Reference
 
 ### Authentication
