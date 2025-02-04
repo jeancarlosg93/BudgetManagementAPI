@@ -6,7 +6,7 @@ import ca.vanier.budgetmanagement.util.GlobalLogger;
 
 
 public class IncomeValidator {
-
+    //Validates if the provided month is between 1 and 12
     public static void validateMonth(int month) {
         if (month < 1 || month > 12) {
             GlobalLogger.warn(IncomeValidator.class, "Invalid month provided: {}", month);
@@ -14,6 +14,7 @@ public class IncomeValidator {
         }
     }
 
+    //Validates if the year is between 1900 and next year
     public static void validateYear(int year) {
         int currentYear = java.time.Year.now().getValue();
         if (year < 1900 || year > currentYear + 1) {
@@ -22,13 +23,14 @@ public class IncomeValidator {
         }
     }
 
+    //Validates if the amount is non-negative
     public static void validateAmount(double amount) {
         if (amount < 0) {
             GlobalLogger.warn(IncomeValidator.class, "Invalid amount provided: {}", amount);
             throw new IllegalArgumentException("Amount cannot be negative");
         }
     }
-
+    //Performs validation on an income object
     public static void validateIncome(Income income) {
         if (income == null) {
             throw new IllegalArgumentException("Income cannot be null");
@@ -51,6 +53,7 @@ public class IncomeValidator {
         validateYear(income.getDate().getYear());
     }
 
+    //Validates if the income type is valid
     public static void validateIncomeType(String incomeType) {
         try {
             IncomeType.valueOf(incomeType.toUpperCase());

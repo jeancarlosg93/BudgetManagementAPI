@@ -19,14 +19,17 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
     public ExpenseCategory save(ExpenseCategory expenseCategory) {
         GlobalLogger.info(ExpenseCategoryServiceImpl.class, "Saving ExpenseCategory: {}", expenseCategory);
 
+        // Check if the expenseCategory already exists with the same name and user
         if (expenseCategoryRepository.findByNameAndUser(expenseCategory.getName(), expenseCategory.getUser()) != null) {
             GlobalLogger.warn(ExpenseCategoryServiceImpl.class,
                     "ExpenseCategory already exists with name: {}, and userId: {}",
                     expenseCategory.getName(), expenseCategory.getUser().getId());
             throw new IllegalArgumentException("Cannot save expenseCategory with existing name and user");
         }
-
+        // Check if the expenseCategory already exists with the same ID
         if (expenseCategory.getId() == null) {
+
+            //if valid, save the expenseCategory
             ExpenseCategory savedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
             GlobalLogger.info(ExpenseCategoryServiceImpl.class, "ExpenseCategory saved successfully with id: {}",
                     savedExpenseCategory.getId());
@@ -54,9 +57,11 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
     @Override
     public ExpenseCategory updateExistingExpenseCategory(Long id, ExpenseCategory expenseCategoryDetails) {
         GlobalLogger.info(ExpenseCategoryServiceImpl.class, "Updating ExpenseCategory with id: {}", id);
+        // Check if the expenseCategory exists, if not throw an exception
         ExpenseCategory expenseCategory = expenseCategoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ExpenseCategory not found"));
         if (expenseCategoryDetails.getName() != null) {
+            //set the new name of the expenseCategory
             expenseCategory.setName(expenseCategoryDetails.getName());
         }
         expenseCategoryRepository.save(expenseCategory);
